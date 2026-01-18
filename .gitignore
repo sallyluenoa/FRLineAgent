@@ -34,3 +34,19 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Environment variables and local configs
+.env
+.env.*
+local.properties
+application-local.yaml
+application-local.conf
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
