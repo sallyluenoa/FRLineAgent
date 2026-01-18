@@ -16,6 +16,7 @@
 
 rootProject.name = "FRLineAgent"
 
+@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
