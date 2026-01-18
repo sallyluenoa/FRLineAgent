@@ -1,43 +1,67 @@
 # FRLineAgent
 
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
+## Overview
+FRLineAgent is a backend application designed to facilitate the integration between the LINE Messaging API and Google Cloud Run.
+It acts as an agent to handle webhook events from LINE and process them within a serverless environment on Google Cloud.
 
-Here are some useful links to get you started:
+## Tools & Tech Stack
+This project is built using the following technologies:
 
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need
-  to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
+- **Language**: [Kotlin](https://kotlinlang.org/)
+- **Framework**: [Ktor](https://ktor.io/) (Server-side framework)
+- **Build System**: [Gradle](https://gradle.org/)
+- **Serialization**: kotlinx.serialization
+- **Logging**: Logback
+- **Platform**: Google Cloud Run (Target deployment)
 
-## Features
+## How to Run
 
-Here's a list of features included in this project:
+### Prerequisites
+- JDK 17 or higher
+- Gradle (optional, wrapper is included)
 
-| Name                                                                   | Description                                                                        |
-|------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| [Routing](https://start.ktor.io/p/routing)                             | Provides a structured routing DSL                                                  |
-| [Content Negotiation](https://start.ktor.io/p/content-negotiation)     | Provides automatic content conversion according to Content-Type and Accept headers |
-| [kotlinx.serialization](https://start.ktor.io/p/kotlinx-serialization) | Handles JSON serialization using kotlinx.serialization library                     |
-| [Call Logging](https://start.ktor.io/p/call-logging)                   | Logs client requests                                                               |
+### Running Locally
+To run the server locally, execute the following command:
 
-## Building & Running
-
-To build or run the project, use one of the following tasks:
-
-| Task                                    | Description                                                          |
-|-----------------------------------------|----------------------------------------------------------------------|
-| `./gradlew test`                        | Run the tests                                                        |
-| `./gradlew build`                       | Build everything                                                     |
-| `./gradlew buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
-| `./gradlew buildImage`                  | Build the docker image to use with the fat JAR                       |
-| `./gradlew publishImageToLocalRegistry` | Publish the docker image locally                                     |
-| `./gradlew run`                         | Run the server                                                       |
-| `./gradlew runDocker`                   | Run using the local docker image                                     |
-
-If the server starts successfully, you'll see the following output:
-
-```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
+```bash
+./gradlew run
 ```
 
+The server will start and listen on `http://localhost:8080` by default.
+
+### Running Tests
+To run the unit tests, execute:
+
+```bash
+./gradlew test
+```
+
+### Building
+To build the project, run:
+
+```bash
+./gradlew build
+```
+
+To build a fat JAR (executable JAR with all dependencies):
+
+```bash
+./gradlew buildFatJar
+```
+
+## Project Structure
+
+```
+FRLineAgent/
+├── src/
+│   ├── main/
+│   │   ├── kotlin/      # Kotlin source code
+│   │   └── resources/   # Configuration files (application.yaml, etc.)
+│   └── test/            # Unit and integration tests
+├── gradle/              # Gradle wrapper and version catalogs
+├── build.gradle.kts     # Build configuration
+└── settings.gradle.kts  # Project settings
+```
+
+## License
+This project is licensed under the Apache License, Version 2.0. See the [LICENSE.txt](LICENSE.txt) file for details.
