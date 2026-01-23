@@ -8,32 +8,48 @@ skinparam style strictuml
 skinparam MaxMessageSize 200
 
 participant "Cloud Scheduler" as Scheduler
-box "FRLineAgent (Cloud Run)" #f9f9f9
+box "FRLineAgent" #f9f9f9
     participant Routing
-    participant "Secret Manager" as SM
-    participant "Data Provider" as Provider
-    participant "Line Messaging Client" as Client
+    participant "Data Provider" as Sheets
+    participant "Line Client" as Client
 end box
+database "Google Sheets" as GSheets
 participant "LINE Platform" as LINE
 actor User
 
-== Initialization ==
-Routing -> SM: Access Channel Access Token
-SM --> Routing: Token String
-
 == Scheduled Execution ==
-Scheduler -> Routing: POST /internal/push-trigger\n(Auth: OIDC Token)
 
-note over Routing: Validate request is from Cloud Scheduler
+Scheduler -> Routing: POST /internal/push-trigger (OIDC Auth)
 
-Routing -> Provider: Fetch data for notification
-Provider --> Routing: Notification Content
+alt #LightPink Auth Error
+    Routing --> Scheduler: 401 Unauthorized
+end
+
+Routing -> Sheets: Fetch notification data
+Sheets -> GSheets: Google Sheets API Call
+GSheets --> Sheets: Return Data
+
+alt #LightPink Data / Sheets API Error
+    Sheets --> Routing: Error / Empty
+    Routing --> Scheduler: 500 Internal Server Error
+end
+
+== LINE API Interaction ==
 
 Routing -> Client: Call Push Message API
-Client -> LINE: POST /v2/bot/message/push\n(Target: UserID, Content)
-LINE --> User: Deliver Push Message
+Client -> LINE: POST /v2/bot/message/push
 
-Routing --> Scheduler: 200 OK (Job Completed)
+alt #LightPink LINE API Error (4xx/5xx)
+    LINE --> Client: Error Response
+    Client -> Client: Log Detail
+    Client --> Routing: Throw Exception
+    Routing --> Scheduler: 500 Internal Server Error
+else #LightBlue Success Path
+    LINE --> Client: 200 OK
+    Client --> Routing: Success
+    Routing --> Scheduler: 200 OK
+    LINE --> User: Deliver Message
+end
 
 @enduml
 ```

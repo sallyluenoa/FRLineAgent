@@ -11,40 +11,54 @@ actor User
 participant "LINE Platform" as LINE
 box "FRLineAgent (Cloud Run)" #f9f9f9
     participant Routing
-    participant "Secret Manager" as SM
     participant "Signature Verifier" as Verifier
-    participant "Event Handler" as Handler
-    participant "Business Logic" as Service
+    participant "Background Worker" as Worker
+    participant "Google Sheets Client" as Sheets
     participant "Line Messaging Client" as Client
 end box
+database "Google Sheets" as GSheets
 
-== Initialization / Fetch Credentials ==
-note over Routing, SM: Credentials should be cached after first fetch
-Routing -> SM: Access Channel Secret & Token
-SM --> Routing: Secret / Token Strings
-
-== Webhook Execution ==
+== Webhook Reception ==
 User -> LINE: Sends message
-LINE -> Routing: POST /webhook\nHeader: [X-Line-Signature]
+LINE -> Routing: POST /webhook\n[X-Line-Signature]
 
-Routing -> Verifier: Verify Signature\n(Payload, Signature, Secret)
-
-alt Signature Valid
-    Verifier --> Routing: Success
-    Routing -> Handler: Dispatch Message Event
-    
-    Handler -> Service: Process Message
-    Service --> Handler: Prepared Reply Text
-    
-    Handler -> Client: Call Reply API
-    Client -> LINE: POST /v2/bot/message/reply
-    LINE --> User: Deliver Reply Message
-    
-    Routing --> LINE: 200 OK
-else Signature Invalid
+Routing -> Verifier: Verify Signature
+alt #LightPink Signature Invalid
     Verifier --> Routing: Failure
     Routing --> LINE: 401 Unauthorized
+    note right: Process stops here
+else #LightBlue Signature Valid
+    Verifier --> Routing: Success
+    
+    note over Routing: Launch Coroutine
+    Routing -> Worker: Dispatch Event (Async)
+    activate Worker
+    
+    Routing --> LINE: 200 OK
+    deactivate Routing
 end
+
+== Asynchronous Data Processing ==
+group #Ivory Background Process
+    Worker -> Sheets: Request Data
+    Sheets -> GSheets: Google Sheets API Call
+    
+    alt #LightBlue Success (Data Found)
+        GSheets --> Sheets: Return Data
+        Sheets --> Worker: Parsed Data
+        Worker -> Worker: Compose Success Message
+    else #LightPink Failure (API Error / No Data)
+        GSheets --X Sheets: Error (404/500/Timeout)
+        Sheets --> Worker: Throw Exception / Return Error
+        Worker -> Worker: Compose Error Message\n(e.g., "System is busy")
+    end
+    
+    Worker -> Client: Call Reply API (ReplyToken, Message)
+    Client -> LINE: POST /v2/bot/message/reply
+    deactivate Worker
+end
+
+LINE --> User: Deliver Message (Success or Error notification)
 
 @enduml
 ```
