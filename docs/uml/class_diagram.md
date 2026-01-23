@@ -1,81 +1,101 @@
-# Class Diagram: Layered Architecture
+# Class Diagram: Full Layered Structure (Strict T-B Layout)
 
-This class diagram defines the structure using Layered Architecture.
-Interfaces are used to ensure high testability.
+This diagram shows the complete class members and their strict hierarchical
+relationships, ensuring that logic flow and dependency directions are clear.
 
 ```plantuml
 @startuml
+' --- Configuration ---
 skinparam style strictuml
 skinparam linetype ortho
 skinparam packageStyle rectangle
+top to bottom direction
 
-package "Presentation Layer (Routing)" {
+' --- Presentation Layer ---
+package "1. Presentation Layer" as Presentation #FEFEFE {
     class WebhookRoute {
         - service: LineBotService
-        - verifier: SignatureVerifier
-        + handle(call: ApplicationCall)
+        + handle(call: ApplicationCall): Unit
     }
     class PushTriggerRoute {
         - service: LineBotService
-        + handle(call: ApplicationCall)
+        + handle(call: ApplicationCall): Unit
     }
 }
 
-package "Domain / Service Layer" {
+' --- Service Layer ---
+package "2. Service Layer" as Service #F5F5F5 {
     class LineBotService {
         - sheetsRepo: SheetsRepository
         - lineClient: LineClient
-        + processWebhookEvent(event: MessageEvent)
-        + executeScheduledPush()
+        - verifier: SignatureVerifier
+        + handleWebhook(body: String, signature: String): Result<Unit>
+        + executeScheduledPush(): Result<Unit>
+    }
+    
+    interface SignatureVerifier <<interface>> {
+        + verify(body: String, signature: String): Boolean
     }
     
     interface SheetsRepository <<interface>> {
-        + fetchNotificationData(): NotificationData
+        + fetchNotificationData(): List<NotificationContent>
     }
     
     interface LineClient <<interface>> {
         + reply(token: String, message: String): Result<Unit>
         + push(userId: String, message: String): Result<Unit>
     }
+    
+    class NotificationContent <<data>> {
+        + userId: String
+        + message: String
+    }
 }
 
-package "Infrastructure Layer (Data/External)" {
+' --- Infrastructure Layer ---
+package "3. Infrastructure Layer" as Infra #EEEEEE {
+    class LineSignatureVerifierImpl {
+        - channelSecret: String
+        + verify(body: String, signature: String): Boolean
+    }
     class GoogleSheetsRepositoryImpl {
         - spreadsheetId: String
-        + fetchNotificationData(): NotificationData
+        - credentialsJson: String
+        + fetchNotificationData(): List<NotificationContent>
     }
-    
     class LineMessagingClientImpl {
         - accessToken: String
         + reply(token: String, message: String): Result<Unit>
         + push(userId: String, message: String): Result<Unit>
     }
-    
-    class LineSignatureVerifier {
-        - channelSecret: String
-        + verify(body: String, signature: String): Boolean
-    }
-    
     class SecretManagerProvider {
-        + getCredential(key: String): String
+        + getSecret(key: String): String
     }
 }
 
-' Relationships & Dependency Inversion
-WebhookRoute --> LineBotService
-PushTriggerRoute --> LineBotService
-WebhookRoute --> LineSignatureVerifier
+' --- Layout Constraints (Hidden Links) ---
+Presentation -[hidden]down-> Service
+Service -[hidden]down-> Infra
 
-LineBotService --> SheetsRepository
-LineBotService --> LineClient
+' --- Real Relationships ---
+' Presentation -> Service
+WebhookRoute -down-> LineBotService
+PushTriggerRoute -down-> LineBotService
 
-' Implementation of Interfaces
-GoogleSheetsRepositoryImpl ..|> SheetsRepository
-LineMessagingClientImpl ..|> LineClient
+' Service Logic Dependencies
+LineBotService -right-> SignatureVerifier
+LineBotService -right-> SheetsRepository
+LineBotService -right-> LineClient
+LineBotService .right.> NotificationContent
 
-' Infrastructure using Shared Resources
-LineMessagingClientImpl ..> SecretManagerProvider : fetch token
-LineSignatureVerifier ..> SecretManagerProvider : fetch secret
+' Dependency Inversion: Infra implements Service Interfaces
+LineSignatureVerifierImpl .up.|> SignatureVerifier
+GoogleSheetsRepositoryImpl .up.|> SheetsRepository
+LineMessagingClientImpl .up.|> LineClient
+
+' Internal Infra usage
+LineMessagingClientImpl .right.> SecretManagerProvider
+LineSignatureVerifierImpl .right.> SecretManagerProvider
 
 @enduml
 ```
