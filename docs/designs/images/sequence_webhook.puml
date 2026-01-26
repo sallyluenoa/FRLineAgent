@@ -1,8 +1,3 @@
-# Sequence Diagram: LINE Webhook Processing
-
-This diagram illustrates the flow from receiving a LINE message to sending a reply, including signature verification and credential retrieval from GCP Secret Manager.
-
-```plantuml
 @startuml
 skinparam style strictuml
 skinparam MaxMessageSize 200
@@ -29,11 +24,11 @@ alt #LightPink Signature Invalid
     note right: Process stops here
 else #LightBlue Signature Valid
     Verifier --> Routing: Success
-    
+
     note over Routing: Launch Coroutine
     Routing -> Worker: Dispatch Event (Async)
     activate Worker
-    
+
     Routing --> LINE: 200 OK
     deactivate Routing
 end
@@ -42,7 +37,7 @@ end
 group #Ivory Background Process
     Worker -> Sheets: Request Data
     Sheets -> GSheets: Google Sheets API Call
-    
+
     alt #LightBlue Success (Data Found)
         GSheets --> Sheets: Return Data
         Sheets --> Worker: Parsed Data
@@ -52,7 +47,7 @@ group #Ivory Background Process
         Sheets --> Worker: Throw Exception / Return Error
         Worker -> Worker: Compose Error Message\n(e.g., "System is busy")
     end
-    
+
     Worker -> Client: Call Reply API (ReplyToken, Message)
     Client -> LINE: POST /v2/bot/message/reply
     deactivate Worker
@@ -61,4 +56,3 @@ end
 LINE --> User: Deliver Message (Success or Error notification)
 
 @enduml
-```

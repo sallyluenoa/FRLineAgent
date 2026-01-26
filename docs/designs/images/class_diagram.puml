@@ -1,9 +1,3 @@
-# Class Diagram: Full Layered Structure (Strict T-B Layout)
-
-This diagram shows the complete class members and their strict hierarchical
-relationships, ensuring that logic flow and dependency directions are clear.
-
-```plantuml
 @startuml
 ' --- Configuration ---
 skinparam style strictuml
@@ -32,20 +26,20 @@ package "2. Service Layer" as Service #F5F5F5 {
         + handleWebhook(body: String, signature: String): Result<Unit>
         + executeScheduledPush(): Result<Unit>
     }
-    
+
     interface SignatureVerifier <<interface>> {
         + verify(body: String, signature: String): Boolean
     }
-    
+
     interface SheetsRepository <<interface>> {
         + fetchNotificationData(): List<NotificationContent>
     }
-    
+
     interface LineClient <<interface>> {
         + reply(token: String, message: String): Result<Unit>
         + push(userId: String, message: String): Result<Unit>
     }
-    
+
     class NotificationContent <<data>> {
         + userId: String
         + message: String
@@ -98,4 +92,3 @@ LineMessagingClientImpl .right.> SecretManagerProvider
 LineSignatureVerifierImpl .right.> SecretManagerProvider
 
 @enduml
-```
