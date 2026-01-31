@@ -17,6 +17,6 @@
 ktor:
   application:
     modules:
-      - org.fog_rock.ApplicationKt.module
+      - org.fog_rock.frlineagent.ApplicationKt.module
   deployment:
     port: 8080

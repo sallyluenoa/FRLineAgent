@@ -55,7 +55,7 @@ To build a fat JAR (executable JAR with all dependencies):
 FRLineAgent/
 ├── src/
 │   ├── main/
-│   │   ├── kotlin/com/example/frlineagent/
+│   │   ├── kotlin/org/fog_rock/frlineagent/
 │   │   │   ├── presentation/   # Handles external HTTP requests and validation (Routing)
 │   │   │   ├── domain/         # Business logic and abstractions (Service, Interfaces, Models)
 │   │   │   ├── infrastructure/ # Concrete implementations of external APIs/SDKs (Google, LINE, GCP)
