@@ -1,0 +1,58 @@
+@startuml
+skinparam style strictuml
+skinparam MaxMessageSize 200
+
+actor User
+participant "LINE Platform" as LINE
+box "FRLineAgent (Cloud Run)" #f9f9f9
+    participant Routing
+    participant "Signature Verifier" as Verifier
+    participant "Background Worker" as Worker
+    participant "Google Sheets Client" as Sheets
+    participant "Line Messaging Client" as Client
+end box
+database "Google Sheets" as GSheets
+
+== Webhook Reception ==
+User -> LINE: Sends message
+LINE -> Routing: POST /webhook\n[X-Line-Signature]
+
+Routing -> Verifier: Verify Signature
+alt #LightPink Signature Invalid
+    Verifier --> Routing: Failure
+    Routing --> LINE: 401 Unauthorized
+    note right: Process stops here
+else #LightBlue Signature Valid
+    Verifier --> Routing: Success
+
+    note over Routing: Launch Coroutine
+    Routing -> Worker: Dispatch Event (Async)
+    activate Worker
+
+    Routing --> LINE: 200 OK
+    deactivate Routing
+end
+
+== Asynchronous Data Processing ==
+group #Ivory Background Process
+    Worker -> Sheets: Request Data
+    Sheets -> GSheets: Google Sheets API Call
+
+    alt #LightBlue Success (Data Found)
+        GSheets --> Sheets: Return Data
+        Sheets --> Worker: Parsed Data
+        Worker -> Worker: Compose Success Message
+    else #LightPink Failure (API Error / No Data)
+        GSheets --X Sheets: Error (404/500/Timeout)
+        Sheets --> Worker: Throw Exception / Return Error
+        Worker -> Worker: Compose Error Message\n(e.g., "System is busy")
+    end
+
+    Worker -> Client: Call Reply API (ReplyToken, Message)
+    Client -> LINE: POST /v2/bot/message/reply
+    deactivate Worker
+end
+
+LINE --> User: Deliver Message (Success or Error notification)
+
+@enduml
