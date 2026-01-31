@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-package org.fog_rock
+package org.fog_rock.frlineagent.domain.service
 
-import io.ktor.server.application.Application
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.get
-import io.ktor.server.routing.routing
-
-fun Application.configureRouting() {
-    routing {
-        get("/") {
-            call.respondText("Hello World!")
-        }
-    }
+interface SignatureVerifier {
+    fun verify(body: String, signature: String): Boolean
 }

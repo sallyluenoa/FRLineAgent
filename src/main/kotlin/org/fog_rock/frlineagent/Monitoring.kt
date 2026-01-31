@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package org.fog_rock
+package org.fog_rock.frlineagent
 
-import io.ktor.client.request.get
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.testing.testApplication
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.plugins.calllogging.CallLogging
+import io.ktor.server.request.path
+import org.slf4j.event.Level
 
-class ApplicationTest {
-
-    @Test
-    fun testRoot() = testApplication {
-        application {
-            module()
-        }
-        client.get("/").apply {
-            assertEquals(HttpStatusCode.OK, status)
-        }
+fun Application.configureMonitoring() {
+    install(CallLogging) {
+        level = Level.INFO
+        filter { call -> call.request.path().startsWith("/") }
     }
-
 }

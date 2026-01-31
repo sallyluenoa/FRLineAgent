@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package org.fog_rock
+package org.fog_rock.frlineagent
 
-import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.application.Application
-import io.ktor.server.application.install
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.response.respond
-import io.ktor.server.routing.get
-import io.ktor.server.routing.routing
+import io.ktor.client.request.get
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.testing.testApplication
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-fun Application.configureSerialization() {
-    install(ContentNegotiation) {
-        json()
-    }
-    routing {
-        get("/json/kotlinx-serialization") {
-            call.respond(mapOf("hello" to "world"))
+class ApplicationTest {
+
+    @Test
+    fun testRoot() = testApplication {
+        application {
+            module()
+        }
+        client.get("/").apply {
+            assertEquals(HttpStatusCode.OK, status)
         }
     }
+
 }
