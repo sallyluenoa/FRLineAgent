@@ -31,6 +31,9 @@ dependencies {
     implementation(libs.bundles.ktor.server)
     implementation(libs.logback.classic)
     implementation(libs.google.cloud.secretmanager)
+    implementation(libs.google.api.client)
+    implementation(libs.google.oauth.client.jetty)
+    implementation(libs.google.sheets.api)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 }

@@ -19,6 +19,9 @@ kotlin = "2.2.21"
 ktor = "3.3.2"
 logback = "1.5.25"
 google-cloud-secretmanager = "2.83.0"
+google-api-client = "2.8.1"
+google-oauth-client = "1.39.0"
+google-sheets-api = "v4-rev20251110-2.0.0"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
@@ -31,6 +34,9 @@ ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref 
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 google-cloud-secretmanager = { module = "com.google.cloud:google-cloud-secretmanager", version.ref = "google-cloud-secretmanager" }
+google-api-client = { module = "com.google.api-client:google-api-client", version.ref = "google-api-client" }
+google-oauth-client-jetty = { module = "com.google.oauth-client:google-oauth-client-jetty", version.ref = "google-oauth-client" }
+google-sheets-api = { module = "com.google.apis:google-api-services-sheets", version.ref = "google-sheets-api" }
 
 [bundles]
 ktor-server = [
