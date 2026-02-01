@@ -16,8 +16,28 @@
 
 package org.fog_rock.frlineagent.infrastructure.external
 
+import com.google.cloud.secretmanager.v1.SecretManagerServiceClient
+import com.google.cloud.secretmanager.v1.SecretVersionName
+
 class SecretManagerProvider {
+
     fun getSecret(key: String): String {
-        TODO("Not yet implemented")
+        val env = System.getenv("APP_ENV") ?: "local"
+        return if (env == "local") {
+            System.getenv(key) ?: throw IllegalArgumentException("Environment variable $key not found.")
+        } else {
+            getSecretFromCloud(key)
+        }
+    }
+
+    private fun getSecretFromCloud(secretId: String): String {
+        val projectId = System.getenv("GOOGLE_CLOUD_PROJECT")
+            ?: throw IllegalStateException("GOOGLE_CLOUD_PROJECT environment variable is not set.")
+
+        SecretManagerServiceClient.create().use { client ->
+            val secretVersionName = SecretVersionName.of(projectId, secretId, "latest")
+            val response = client.accessSecretVersion(secretVersionName)
+            return response.payload.data.toStringUtf8()
+        }
     }
 }

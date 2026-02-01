@@ -30,6 +30,7 @@ application {
 dependencies {
     implementation(libs.bundles.ktor.server)
     implementation(libs.logback.classic)
+    implementation(libs.google.cloud.secretmanager)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 }
