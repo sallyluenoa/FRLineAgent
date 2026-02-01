@@ -16,16 +16,51 @@
 
 package org.fog_rock.frlineagent.infrastructure.service
 
+import com.linecorp.bot.messaging.client.MessagingApiClient
+import com.linecorp.bot.messaging.model.PushMessageRequest
+import com.linecorp.bot.messaging.model.ReplyMessageRequest
+import com.linecorp.bot.messaging.model.TextMessage
 import org.fog_rock.frlineagent.domain.service.LineClient
+import org.fog_rock.frlineagent.infrastructure.external.SecretManagerProvider
+import org.slf4j.LoggerFactory
+import java.util.UUID
 
 class LineMessagingClientImpl(
-    private val accessToken: String
+    private val secretManagerProvider: SecretManagerProvider
 ) : LineClient {
+
+    private val logger = LoggerFactory.getLogger(LineMessagingClientImpl::class.java)
+
+    companion object {
+        private const val CHANNEL_ACCESS_TOKEN_KEY = "LINE_CHANNEL_ACCESS_TOKEN"
+    }
+
+    private val client: MessagingApiClient by lazy {
+        val channelAccessToken = secretManagerProvider.getSecret(CHANNEL_ACCESS_TOKEN_KEY)
+        MessagingApiClient.builder(channelAccessToken).build()
+    }
+
     override fun reply(token: String, message: String): Result<Unit> {
-        TODO("Not yet implemented")
+        return try {
+            val replyMessageRequest = ReplyMessageRequest.Builder(token, listOf(TextMessage(message))).build()
+            val response = client.replyMessage(replyMessageRequest).get()
+            logger.info("Reply message sent: $response")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            logger.error("Failed to reply message", e)
+            Result.failure(e)
+        }
     }
 
     override fun push(userId: String, message: String): Result<Unit> {
-        TODO("Not yet implemented")
+        return try {
+            val pushMessageRequest = PushMessageRequest.Builder(userId, listOf(TextMessage(message))).build()
+            val response = client.pushMessage(UUID.randomUUID(), pushMessageRequest).get()
+            logger.info("Push message sent: $response")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            logger.error("Failed to push message", e)
+            Result.failure(e)
+        }
     }
 }

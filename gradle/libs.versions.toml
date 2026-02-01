@@ -22,6 +22,7 @@ google-cloud-secretmanager = "2.83.0"
 google-api-client = "2.8.1"
 google-oauth-client = "1.39.0"
 google-sheets-api = "v4-rev20251110-2.0.0"
+line-bot-sdk = "9.14.0"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
@@ -37,6 +38,9 @@ google-cloud-secretmanager = { module = "com.google.cloud:google-cloud-secretman
 google-api-client = { module = "com.google.api-client:google-api-client", version.ref = "google-api-client" }
 google-oauth-client-jetty = { module = "com.google.oauth-client:google-oauth-client-jetty", version.ref = "google-oauth-client" }
 google-sheets-api = { module = "com.google.apis:google-api-services-sheets", version.ref = "google-sheets-api" }
+line-bot-messaging = { module = "com.linecorp.bot:line-bot-messaging-api-client", version.ref = "line-bot-sdk" }
+line-bot-webhook = { module = "com.linecorp.bot:line-bot-webhook", version.ref = "line-bot-sdk" }
+line-bot-parser = { module = "com.linecorp.bot:line-bot-parser", version.ref = "line-bot-sdk" }
 
 [bundles]
 ktor-server = [
@@ -46,6 +50,11 @@ ktor-server = [
     "ktor-server-call-logging",
     "ktor-server-netty",
     "ktor-server-config-yaml"
+]
+line-bot = [
+    "line-bot-messaging",
+    "line-bot-webhook",
+    "line-bot-parser"
 ]
 
 [plugins]

@@ -16,12 +16,30 @@
 
 package org.fog_rock.frlineagent.infrastructure.service
 
+import com.linecorp.bot.parser.LineSignatureValidator
 import org.fog_rock.frlineagent.domain.service.SignatureVerifier
+import org.fog_rock.frlineagent.infrastructure.external.SecretManagerProvider
+import org.slf4j.LoggerFactory
+import java.nio.charset.StandardCharsets
 
 class LineSignatureVerifierImpl(
-    private val channelSecret: String
+    private val secretManagerProvider: SecretManagerProvider
 ) : SignatureVerifier {
+
+    private val logger = LoggerFactory.getLogger(LineSignatureVerifierImpl::class.java)
+
+    companion object {
+        private const val CHANNEL_SECRET_KEY = "LINE_CHANNEL_SECRET"
+    }
+
     override fun verify(body: String, signature: String): Boolean {
-        TODO("Not yet implemented")
+        return try {
+            val channelSecret = secretManagerProvider.getSecret(CHANNEL_SECRET_KEY)
+            val validator = LineSignatureValidator(channelSecret.toByteArray(StandardCharsets.UTF_8))
+            validator.validateSignature(body.toByteArray(StandardCharsets.UTF_8), signature)
+        } catch (e: Exception) {
+            logger.error("Failed to verify signature", e)
+            false
+        }
     }
 }
