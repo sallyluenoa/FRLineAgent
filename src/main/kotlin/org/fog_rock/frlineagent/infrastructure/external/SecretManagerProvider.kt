@@ -18,17 +18,18 @@ package org.fog_rock.frlineagent.infrastructure.external
 
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient
 import com.google.cloud.secretmanager.v1.SecretVersionName
+import org.fog_rock.frlineagent.domain.config.AppConfig
 
-class SecretManagerProvider {
+class SecretManagerProvider(private val appConfig: AppConfig) {
 
-    fun getSecret(key: String): String {
-        val env = System.getenv("APP_ENV") ?: "local"
-        return if (env == "local") {
-            System.getenv(key) ?: throw IllegalArgumentException("Environment variable $key not found.")
-        } else {
-            getSecretFromCloud(key)
+    fun getSecret(key: String): String =
+        when (appConfig.secretManagerMode) {
+            AppConfig.ProviderMode.CLOUD -> getSecretFromCloud(key)
+            AppConfig.ProviderMode.MOCK -> getSecretFromEnv(key)
         }
-    }
+
+    private fun getSecretFromEnv(key: String): String =
+        System.getenv(key) ?: throw IllegalArgumentException("Environment variable $key not found.")
 
     private fun getSecretFromCloud(secretId: String): String {
         val projectId = System.getenv("GOOGLE_CLOUD_PROJECT")

@@ -17,6 +17,7 @@
 [versions]
 kotlin = "2.2.21"
 ktor = "3.3.2"
+koin = "4.1.1"
 logback = "1.5.25"
 google-cloud-secretmanager = "2.83.0"
 google-api-client = "2.8.1"
@@ -32,6 +33,8 @@ ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", versio
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
+koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
+koin-logger-slf4j = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 google-cloud-secretmanager = { module = "com.google.cloud:google-cloud-secretmanager", version.ref = "google-cloud-secretmanager" }
@@ -50,6 +53,10 @@ ktor-server = [
     "ktor-server-call-logging",
     "ktor-server-netty",
     "ktor-server-config-yaml"
+]
+koin = [
+    "koin-ktor",
+    "koin-logger-slf4j"
 ]
 line-bot = [
     "line-bot-messaging",

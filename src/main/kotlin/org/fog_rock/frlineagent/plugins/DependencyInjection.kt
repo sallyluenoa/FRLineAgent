@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent
+package org.fog_rock.frlineagent.plugins
 
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
-import io.ktor.server.plugins.calllogging.CallLogging
-import io.ktor.server.request.path
-import org.slf4j.event.Level
+import org.fog_rock.frlineagent.domain.config.AppConfig
+import org.fog_rock.frlineagent.infrastructure.config.KtorAppConfig
+import org.fog_rock.frlineagent.infrastructure.external.SecretManagerProvider
+import org.koin.dsl.module
+import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
 
-fun Application.configureMonitoring() {
-    install(CallLogging) {
-        level = Level.INFO
-        filter { call -> call.request.path().startsWith("/") }
+fun Application.configureDI() {
+    install(Koin) {
+        slf4jLogger()
+        val koinModule = module {
+            single<AppConfig> { KtorAppConfig(environment.config) }
+            single { SecretManagerProvider(get()) }
+        }
+        modules(koinModule)
     }
 }

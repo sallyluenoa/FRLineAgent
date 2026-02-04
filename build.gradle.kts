@@ -29,6 +29,7 @@ application {
 
 dependencies {
     implementation(libs.bundles.ktor.server)
+    implementation(libs.bundles.koin)
     implementation(libs.logback.classic)
     implementation(libs.google.cloud.secretmanager)
     implementation(libs.google.api.client)
