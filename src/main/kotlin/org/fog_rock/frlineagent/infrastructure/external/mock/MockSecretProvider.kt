@@ -18,7 +18,7 @@ package org.fog_rock.frlineagent.infrastructure.external.mock
 
 import org.fog_rock.frlineagent.domain.repository.SecretProvider
 
-internal class MockSecretProvider : SecretProvider {
+class MockSecretProvider : SecretProvider {
     private val secrets = mapOf(
         "LINE_CHANNEL_ACCESS_TOKEN" to "mock_line_channel_access_token",
         "LINE_CHANNEL_SECRET" to "mock_line_channel_secret",

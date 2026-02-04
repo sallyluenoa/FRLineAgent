@@ -16,29 +16,17 @@
 
 package org.fog_rock.frlineagent.infrastructure.external
 
-import com.google.cloud.secretmanager.v1.SecretManagerServiceClient
-import com.google.cloud.secretmanager.v1.SecretVersionName
 import org.fog_rock.frlineagent.domain.config.AppConfig
+import org.fog_rock.frlineagent.domain.repository.SecretProvider
+import org.fog_rock.frlineagent.infrastructure.external.gcp.GoogleSecretProvider
+import org.fog_rock.frlineagent.infrastructure.external.mock.MockSecretProvider
 
-class SecretManagerProvider(private val appConfig: AppConfig) {
+class SecretManagerProvider(appConfig: AppConfig) : SecretProvider {
 
-    fun getSecret(key: String): String =
-        when (appConfig.secretManagerMode) {
-            AppConfig.ProviderMode.CLOUD -> getSecretFromCloud(key)
-            AppConfig.ProviderMode.MOCK -> getSecretFromEnv(key)
-        }
-
-    private fun getSecretFromEnv(key: String): String =
-        System.getenv(key) ?: throw IllegalArgumentException("Environment variable $key not found.")
-
-    private fun getSecretFromCloud(secretId: String): String {
-        val projectId = appConfig.googleCloudProjectId
-            ?: throw IllegalStateException("app.google_cloud.project_id is not set in application.yaml.")
-
-        SecretManagerServiceClient.create().use { client ->
-            val secretVersionName = SecretVersionName.of(projectId, secretId, "latest")
-            val response = client.accessSecretVersion(secretVersionName)
-            return response.payload.data.toStringUtf8()
-        }
+    private val provider: SecretProvider = when (appConfig.secretManagerMode) {
+        AppConfig.ProviderMode.CLOUD -> GoogleSecretProvider(appConfig.googleCloudProjectId ?: "")
+        AppConfig.ProviderMode.MOCK -> MockSecretProvider()
     }
+
+    override fun getSecret(key: String): String = provider.getSecret(key)
 }
