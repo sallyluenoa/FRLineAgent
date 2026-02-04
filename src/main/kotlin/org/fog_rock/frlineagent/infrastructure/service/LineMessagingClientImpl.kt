@@ -20,13 +20,13 @@ import com.linecorp.bot.messaging.client.MessagingApiClient
 import com.linecorp.bot.messaging.model.PushMessageRequest
 import com.linecorp.bot.messaging.model.ReplyMessageRequest
 import com.linecorp.bot.messaging.model.TextMessage
+import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.domain.service.LineClient
-import org.fog_rock.frlineagent.infrastructure.external.SecretManagerProvider
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
 class LineMessagingClientImpl(
-    private val secretManagerProvider: SecretManagerProvider
+    private val secretManagerProvider: SecretProvider
 ) : LineClient {
 
     private val logger = LoggerFactory.getLogger(LineMessagingClientImpl::class.java)

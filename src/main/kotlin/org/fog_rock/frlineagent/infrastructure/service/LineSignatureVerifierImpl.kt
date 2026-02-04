@@ -17,13 +17,13 @@
 package org.fog_rock.frlineagent.infrastructure.service
 
 import com.linecorp.bot.parser.LineSignatureValidator
+import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.domain.service.SignatureVerifier
-import org.fog_rock.frlineagent.infrastructure.external.SecretManagerProvider
 import org.slf4j.LoggerFactory
 import java.nio.charset.StandardCharsets
 
 class LineSignatureVerifierImpl(
-    private val secretManagerProvider: SecretManagerProvider
+    private val secretManagerProvider: SecretProvider
 ) : SignatureVerifier {
 
     private val logger = LoggerFactory.getLogger(LineSignatureVerifierImpl::class.java)

@@ -21,14 +21,14 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.sheets.v4.Sheets
 import com.google.api.services.sheets.v4.SheetsScopes
+import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.domain.model.NotificationContent
 import org.fog_rock.frlineagent.domain.repository.SheetsRepository
-import org.fog_rock.frlineagent.infrastructure.external.SecretManagerProvider
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 
 class GoogleSheetsRepositoryImpl(
-    private val secretManagerProvider: SecretManagerProvider
+    private val secretManagerProvider: SecretProvider
 ) : SheetsRepository {
 
     private val logger = LoggerFactory.getLogger(GoogleSheetsRepositoryImpl::class.java)

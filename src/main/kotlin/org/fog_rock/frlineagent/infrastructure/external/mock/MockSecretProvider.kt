@@ -14,29 +14,18 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.domain.config
+package org.fog_rock.frlineagent.infrastructure.external.mock
 
-/**
- * An interface for managing the integration mode with external services.
- */
-interface AppConfig {
-    /**
-     * Provider mode.
-     */
-    enum class ProviderMode {
-        /** Use cloud services. */
-        CLOUD,
-        /** Use mocks. */
-        MOCK,
-    }
+import org.fog_rock.frlineagent.domain.repository.SecretProvider
 
-    /** Mode for Secret Manager. */
-    val secretManagerMode: ProviderMode
-    /** Mode for Spreadsheet. */
-    val spreadsheetMode: ProviderMode
-    /** Mode for LINE API. */
-    val lineApiMode: ProviderMode
+internal class MockSecretProvider : SecretProvider {
+    private val secrets = mapOf(
+        "LINE_CHANNEL_ACCESS_TOKEN" to "mock_line_channel_access_token",
+        "LINE_CHANNEL_SECRET" to "mock_line_channel_secret",
+        "SPREADSHEET_ID" to "mock_spreadsheet_id",
+        "GOOGLE_CREDENTIALS_JSON" to "{}"
+    )
 
-    /** Google Cloud Project ID. */
-    val googleCloudProjectId: String?
+    override fun getSecret(key: String): String =
+        secrets[key] ?: throw IllegalArgumentException("Secret key `$key` not found in mock.")
 }

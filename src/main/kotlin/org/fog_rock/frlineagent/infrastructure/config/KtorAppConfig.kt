@@ -33,6 +33,9 @@ class KtorAppConfig(config: ApplicationConfig) : AppConfig {
     override val lineApiMode: AppConfig.ProviderMode =
         getProviderMode(config, "app.provider.line_api")
 
+    override val googleCloudProjectId: String? =
+        config.propertyOrNull("app.google_cloud.project_id")?.getString()
+
     private fun getProviderMode(config: ApplicationConfig, path: String): AppConfig.ProviderMode {
         val value = config.propertyOrNull(path)?.getString()
         return if (value.equals("cloud", ignoreCase = true)) {

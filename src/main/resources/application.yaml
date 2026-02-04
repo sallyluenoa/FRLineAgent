@@ -25,3 +25,5 @@ app:
     secret_manager: "cloud"
     spreadsheet: "cloud"
     line_api: "cloud"
+  google_cloud:
+    project_id:

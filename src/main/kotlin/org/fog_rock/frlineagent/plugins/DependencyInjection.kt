@@ -18,9 +18,11 @@ package org.fog_rock.frlineagent.plugins
 
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.domain.config.AppConfig
 import org.fog_rock.frlineagent.infrastructure.config.KtorAppConfig
-import org.fog_rock.frlineagent.infrastructure.external.SecretManagerProvider
+import org.fog_rock.frlineagent.infrastructure.external.gcp.GoogleSecretProvider
+import org.fog_rock.frlineagent.infrastructure.external.mock.MockSecretProvider
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -30,7 +32,13 @@ fun Application.configureDI() {
         slf4jLogger()
         val koinModule = module {
             single<AppConfig> { KtorAppConfig(environment.config) }
-            single { SecretManagerProvider(get()) }
+            single<SecretProvider> {
+                val appConfig = get<AppConfig>()
+                when (appConfig.secretManagerMode) {
+                    AppConfig.ProviderMode.CLOUD -> GoogleSecretProvider(appConfig.googleCloudProjectId ?: "")
+                    AppConfig.ProviderMode.MOCK -> MockSecretProvider()
+                }
+            }
         }
         modules(koinModule)
     }
