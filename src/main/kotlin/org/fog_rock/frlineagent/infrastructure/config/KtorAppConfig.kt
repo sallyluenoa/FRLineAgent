@@ -18,30 +18,25 @@ package org.fog_rock.frlineagent.infrastructure.config
 
 import io.ktor.server.config.ApplicationConfig
 import org.fog_rock.frlineagent.domain.config.AppConfig
+import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
 
 /**
  * A class that reads AppConfig from a Ktor configuration file.
  */
 class KtorAppConfig(config: ApplicationConfig) : AppConfig {
 
-    override val secretManagerMode: AppConfig.ProviderMode =
+    override val secretManagerMode: ProviderMode =
         getProviderMode(config, "app.provider.secret_manager")
 
-    override val spreadsheetMode: AppConfig.ProviderMode =
+    override val spreadsheetMode: ProviderMode =
         getProviderMode(config, "app.provider.spreadsheet")
 
-    override val lineApiMode: AppConfig.ProviderMode =
+    override val lineApiMode: ProviderMode =
         getProviderMode(config, "app.provider.line_api")
 
     override val googleCloudProjectId: String? =
         config.propertyOrNull("app.google_cloud.project_id")?.getString()
 
-    private fun getProviderMode(config: ApplicationConfig, path: String): AppConfig.ProviderMode {
-        val value = config.propertyOrNull(path)?.getString()
-        return if (value.equals("cloud", ignoreCase = true)) {
-            AppConfig.ProviderMode.CLOUD
-        } else {
-            AppConfig.ProviderMode.MOCK
-        }
-    }
+    private fun getProviderMode(config: ApplicationConfig, path: String): ProviderMode =
+        ProviderMode.convert(config.propertyOrNull(path)?.getString())
 }

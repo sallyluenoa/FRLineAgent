@@ -16,20 +16,12 @@
 
 package org.fog_rock.frlineagent.domain.config
 
+import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
+
 /**
  * An interface for managing the integration mode with external services.
  */
 interface AppConfig {
-    /**
-     * Provider mode.
-     */
-    enum class ProviderMode {
-        /** Use cloud services. */
-        CLOUD,
-        /** Use mocks. */
-        MOCK,
-    }
-
     /** Mode for Secret Manager. */
     val secretManagerMode: ProviderMode
     /** Mode for Spreadsheet. */

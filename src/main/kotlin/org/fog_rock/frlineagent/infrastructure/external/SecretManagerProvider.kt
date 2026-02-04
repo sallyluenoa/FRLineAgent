@@ -17,6 +17,7 @@
 package org.fog_rock.frlineagent.infrastructure.external
 
 import org.fog_rock.frlineagent.domain.config.AppConfig
+import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
 import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.infrastructure.external.gcp.GoogleSecretProvider
 import org.fog_rock.frlineagent.infrastructure.external.mock.MockSecretProvider
@@ -24,8 +25,8 @@ import org.fog_rock.frlineagent.infrastructure.external.mock.MockSecretProvider
 class SecretManagerProvider(appConfig: AppConfig) : SecretProvider {
 
     private val provider: SecretProvider = when (appConfig.secretManagerMode) {
-        AppConfig.ProviderMode.CLOUD -> GoogleSecretProvider(appConfig.googleCloudProjectId ?: "")
-        AppConfig.ProviderMode.MOCK -> MockSecretProvider()
+        ProviderMode.CLOUD -> GoogleSecretProvider(appConfig.googleCloudProjectId ?: "")
+        ProviderMode.MOCK -> MockSecretProvider()
     }
 
     override fun getSecret(key: String): String = provider.getSecret(key)
