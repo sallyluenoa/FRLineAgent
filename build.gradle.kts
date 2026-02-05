@@ -23,6 +23,10 @@ plugins {
 group = "org.fog_rock"
 version = "0.0.1"
 
+kotlin {
+    jvmToolchain(21)
+}
+
 application {
     mainClass = "io.ktor.server.netty.EngineMain"
 }
@@ -38,4 +42,12 @@ dependencies {
     implementation(libs.bundles.line.bot)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
+    testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.mockk)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

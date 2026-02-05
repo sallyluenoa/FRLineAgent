@@ -24,6 +24,8 @@ google-api-client = "2.8.1"
 google-oauth-client = "1.39.0"
 google-sheets-api = "v4-rev20251110-2.0.0"
 line-bot-sdk = "9.14.0"
+junit-jupiter = "6.0.2"
+mockk = "1.14.9"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
@@ -44,6 +46,10 @@ google-sheets-api = { module = "com.google.apis:google-api-services-sheets", ver
 line-bot-messaging = { module = "com.linecorp.bot:line-bot-messaging-api-client", version.ref = "line-bot-sdk" }
 line-bot-webhook = { module = "com.linecorp.bot:line-bot-webhook", version.ref = "line-bot-sdk" }
 line-bot-parser = { module = "com.linecorp.bot:line-bot-parser", version.ref = "line-bot-sdk" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-jupiter" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
 [bundles]
 ktor-server = [
