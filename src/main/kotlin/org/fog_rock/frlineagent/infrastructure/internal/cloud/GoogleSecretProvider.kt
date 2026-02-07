@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.infrastructure.external.gcp
+package org.fog_rock.frlineagent.infrastructure.internal.cloud
 
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient
 import com.google.cloud.secretmanager.v1.SecretVersionName
 import org.fog_rock.frlineagent.domain.repository.SecretProvider
 
-class GoogleSecretProvider(private val projectId: String) : SecretProvider {
+internal class GoogleSecretProvider(private val projectId: String) : SecretProvider {
     override fun getSecret(key: String): String {
         if (projectId.isBlank()) {
             throw IllegalStateException("Google Cloud Project ID is not set.")

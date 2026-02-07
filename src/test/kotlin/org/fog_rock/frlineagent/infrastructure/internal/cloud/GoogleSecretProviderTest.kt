@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.infrastructure.external.gcp
+package org.fog_rock.frlineagent.infrastructure.internal.cloud
 
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient

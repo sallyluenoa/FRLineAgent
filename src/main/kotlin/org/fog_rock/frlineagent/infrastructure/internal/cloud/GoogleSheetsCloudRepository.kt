@@ -28,7 +28,7 @@ import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.domain.repository.SheetsRepository
 import org.slf4j.LoggerFactory
 
-class GoogleSheetsCloudRepository(
+internal class GoogleSheetsCloudRepository(
     private val config: AppConfig,
     private val secretManagerProvider: SecretProvider
 ) : SheetsRepository {

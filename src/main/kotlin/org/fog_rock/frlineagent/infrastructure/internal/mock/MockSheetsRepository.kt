@@ -19,7 +19,7 @@ package org.fog_rock.frlineagent.infrastructure.internal.mock
 import org.fog_rock.frlineagent.domain.repository.SheetsRepository
 import org.slf4j.LoggerFactory
 
-class MockSheetsRepository : SheetsRepository {
+internal class MockSheetsRepository : SheetsRepository {
 
     private val logger = LoggerFactory.getLogger(MockSheetsRepository::class.java)
 

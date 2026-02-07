@@ -23,8 +23,8 @@ import io.mockk.unmockkAll
 import io.mockk.verify
 import org.fog_rock.frlineagent.domain.config.AppConfig
 import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
-import org.fog_rock.frlineagent.infrastructure.external.gcp.GoogleSecretProvider
-import org.fog_rock.frlineagent.infrastructure.external.mock.MockSecretProvider
+import org.fog_rock.frlineagent.infrastructure.internal.cloud.GoogleSecretProvider
+import org.fog_rock.frlineagent.infrastructure.internal.mock.MockSecretProvider
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
