@@ -16,49 +16,24 @@
 
 package org.fog_rock.frlineagent.infrastructure.service
 
-import com.linecorp.bot.messaging.client.MessagingApiClient
-import com.linecorp.bot.messaging.model.PushMessageRequest
-import com.linecorp.bot.messaging.model.ReplyMessageRequest
-import com.linecorp.bot.messaging.model.TextMessage
 import org.fog_rock.frlineagent.domain.config.AppConfig
+import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
 import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.domain.service.LineClient
-import org.slf4j.LoggerFactory
-import java.util.UUID
+import org.fog_rock.frlineagent.infrastructure.internal.cloud.LineMessagingCloudClient
+import org.fog_rock.frlineagent.infrastructure.internal.mock.LineMessagingMockClient
 
 class LineMessagingClientImpl(
-    private val appConfig: AppConfig,
-    private val secretManagerProvider: SecretProvider
+    appConfig: AppConfig,
+    secretManagerProvider: SecretProvider
 ) : LineClient {
 
-    private val logger = LoggerFactory.getLogger(LineMessagingClientImpl::class.java)
-
-    private val client: MessagingApiClient by lazy {
-        val channelAccessToken = secretManagerProvider.getSecret(appConfig.lineBotChannelAccessTokenKey)
-        MessagingApiClient.builder(channelAccessToken).build()
+    private val client: LineClient = when (appConfig.lineApiMode) {
+        ProviderMode.CLOUD -> LineMessagingCloudClient(appConfig, secretManagerProvider)
+        ProviderMode.MOCK -> LineMessagingMockClient()
     }
 
-    override fun reply(token: String, message: String): Result<Unit> {
-        return try {
-            val replyMessageRequest = ReplyMessageRequest.Builder(token, listOf(TextMessage(message))).build()
-            val response = client.replyMessage(replyMessageRequest).get()
-            logger.info("Reply message sent: $response")
-            Result.success(Unit)
-        } catch (e: Exception) {
-            logger.error("Failed to reply message", e)
-            Result.failure(e)
-        }
-    }
+    override fun reply(token: String, message: String): Result<Unit> = client.reply(token, message)
 
-    override fun push(userId: String, message: String): Result<Unit> {
-        return try {
-            val pushMessageRequest = PushMessageRequest.Builder(userId, listOf(TextMessage(message))).build()
-            val response = client.pushMessage(UUID.randomUUID(), pushMessageRequest).get()
-            logger.info("Push message sent: $response")
-            Result.success(Unit)
-        } catch (e: Exception) {
-            logger.error("Failed to push message", e)
-            Result.failure(e)
-        }
-    }
+    override fun push(userId: String, message: String): Result<Unit> = client.push(userId, message)
 }

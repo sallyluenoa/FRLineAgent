@@ -16,28 +16,22 @@
 
 package org.fog_rock.frlineagent.infrastructure.service
 
-import com.linecorp.bot.parser.LineSignatureValidator
 import org.fog_rock.frlineagent.domain.config.AppConfig
+import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
 import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.domain.service.SignatureVerifier
-import org.slf4j.LoggerFactory
-import java.nio.charset.StandardCharsets
+import org.fog_rock.frlineagent.infrastructure.internal.cloud.LineSignatureCloudVerifier
+import org.fog_rock.frlineagent.infrastructure.internal.mock.LineSignatureMockVerifier
 
 class LineSignatureVerifierImpl(
-    private val appConfig: AppConfig,
-    private val secretManagerProvider: SecretProvider
+    appConfig: AppConfig,
+    secretManagerProvider: SecretProvider
 ) : SignatureVerifier {
 
-    private val logger = LoggerFactory.getLogger(LineSignatureVerifierImpl::class.java)
-
-    override fun verify(body: String, signature: String): Boolean {
-        return try {
-            val channelSecret = secretManagerProvider.getSecret(appConfig.lineBotChannelSecretKey)
-            val validator = LineSignatureValidator(channelSecret.toByteArray(StandardCharsets.UTF_8))
-            validator.validateSignature(body.toByteArray(StandardCharsets.UTF_8), signature)
-        } catch (e: Exception) {
-            logger.error("Failed to verify signature", e)
-            false
-        }
+    private val verifier: SignatureVerifier = when (appConfig.lineApiMode) {
+        ProviderMode.CLOUD -> LineSignatureCloudVerifier(appConfig, secretManagerProvider)
+        ProviderMode.MOCK -> LineSignatureMockVerifier()
     }
+
+    override fun verify(body: String, signature: String): Boolean = verifier.verify(body, signature)
 }
