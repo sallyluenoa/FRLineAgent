@@ -39,4 +39,9 @@ interface AppConfig {
     val googleSheetsCredentialsKey: String
     /** Key for Spreadsheet ID in Secret Manager. */
     val googleSheetsSpreadsheetIdKey: String
+
+    /** Key for LINE Channel Access Token in Secret Manager. */
+    val lineBotChannelAccessTokenKey: String
+    /** Key for LINE Channel Secret in Secret Manager. */
+    val lineBotChannelSecretKey: String
 }

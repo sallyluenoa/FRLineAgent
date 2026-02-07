@@ -17,24 +17,22 @@
 package org.fog_rock.frlineagent.infrastructure.service
 
 import com.linecorp.bot.parser.LineSignatureValidator
+import org.fog_rock.frlineagent.domain.config.AppConfig
 import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.domain.service.SignatureVerifier
 import org.slf4j.LoggerFactory
 import java.nio.charset.StandardCharsets
 
 class LineSignatureVerifierImpl(
+    private val appConfig: AppConfig,
     private val secretManagerProvider: SecretProvider
 ) : SignatureVerifier {
 
     private val logger = LoggerFactory.getLogger(LineSignatureVerifierImpl::class.java)
 
-    companion object {
-        private const val CHANNEL_SECRET_KEY = "LINE_CHANNEL_SECRET"
-    }
-
     override fun verify(body: String, signature: String): Boolean {
         return try {
-            val channelSecret = secretManagerProvider.getSecret(CHANNEL_SECRET_KEY)
+            val channelSecret = secretManagerProvider.getSecret(appConfig.lineBotChannelSecretKey)
             val validator = LineSignatureValidator(channelSecret.toByteArray(StandardCharsets.UTF_8))
             validator.validateSignature(body.toByteArray(StandardCharsets.UTF_8), signature)
         } catch (e: Exception) {

@@ -20,8 +20,14 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import org.fog_rock.frlineagent.domain.config.AppConfig
 import org.fog_rock.frlineagent.domain.repository.SecretProvider
+import org.fog_rock.frlineagent.domain.repository.SheetsRepository
+import org.fog_rock.frlineagent.domain.service.LineClient
+import org.fog_rock.frlineagent.domain.service.SignatureVerifier
 import org.fog_rock.frlineagent.infrastructure.config.KtorAppConfig
 import org.fog_rock.frlineagent.infrastructure.external.SecretManagerProvider
+import org.fog_rock.frlineagent.infrastructure.repository.GoogleSheetsRepositoryImpl
+import org.fog_rock.frlineagent.infrastructure.service.LineMessagingClientImpl
+import org.fog_rock.frlineagent.infrastructure.service.LineSignatureVerifierImpl
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -32,6 +38,9 @@ fun Application.configureDI() {
         val koinModule = module {
             single<AppConfig> { KtorAppConfig(environment.config) }
             single<SecretProvider> { SecretManagerProvider(get()) }
+            single<SheetsRepository> { GoogleSheetsRepositoryImpl(get(), get()) }
+            single<LineClient> { LineMessagingClientImpl(get(), get()) }
+            single<SignatureVerifier> { LineSignatureVerifierImpl(get(), get()) }
         }
         modules(koinModule)
     }

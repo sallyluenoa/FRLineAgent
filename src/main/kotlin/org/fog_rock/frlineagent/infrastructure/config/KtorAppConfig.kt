@@ -46,6 +46,12 @@ class KtorAppConfig(config: ApplicationConfig) : AppConfig {
     override val googleSheetsSpreadsheetIdKey: String =
         config.property("app.google_sheets.spreadsheet_id_key").getString()
 
+    override val lineBotChannelAccessTokenKey: String =
+        config.property("app.line_bot.channel_access_token_key").getString()
+
+    override val lineBotChannelSecretKey: String =
+        config.property("app.line_bot.channel_secret_key").getString()
+
     private fun getProviderMode(config: ApplicationConfig, path: String): ProviderMode =
         ProviderMode.convert(config.propertyOrNull(path)?.getString())
 }

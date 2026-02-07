@@ -31,3 +31,6 @@ app:
   google_sheets:
     credentials_key: ""
     spreadsheet_id_key: ""
+  line_bot:
+    channel_access_token_key: ""
+    channel_secret_key: ""

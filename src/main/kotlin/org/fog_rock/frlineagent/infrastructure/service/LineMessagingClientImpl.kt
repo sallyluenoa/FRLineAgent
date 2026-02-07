@@ -20,23 +20,21 @@ import com.linecorp.bot.messaging.client.MessagingApiClient
 import com.linecorp.bot.messaging.model.PushMessageRequest
 import com.linecorp.bot.messaging.model.ReplyMessageRequest
 import com.linecorp.bot.messaging.model.TextMessage
+import org.fog_rock.frlineagent.domain.config.AppConfig
 import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.domain.service.LineClient
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
 class LineMessagingClientImpl(
+    private val appConfig: AppConfig,
     private val secretManagerProvider: SecretProvider
 ) : LineClient {
 
     private val logger = LoggerFactory.getLogger(LineMessagingClientImpl::class.java)
 
-    companion object {
-        private const val CHANNEL_ACCESS_TOKEN_KEY = "LINE_CHANNEL_ACCESS_TOKEN"
-    }
-
     private val client: MessagingApiClient by lazy {
-        val channelAccessToken = secretManagerProvider.getSecret(CHANNEL_ACCESS_TOKEN_KEY)
+        val channelAccessToken = secretManagerProvider.getSecret(appConfig.lineBotChannelAccessTokenKey)
         MessagingApiClient.builder(channelAccessToken).build()
     }
 
