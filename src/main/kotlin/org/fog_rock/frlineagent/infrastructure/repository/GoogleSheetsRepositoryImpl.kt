@@ -16,49 +16,22 @@
 
 package org.fog_rock.frlineagent.infrastructure.repository
 
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
-import com.google.api.client.json.gson.GsonFactory
-import com.google.api.services.sheets.v4.Sheets
-import com.google.api.services.sheets.v4.SheetsScopes
-import com.google.auth.http.HttpCredentialsAdapter
-import com.google.auth.oauth2.GoogleCredentials
 import org.fog_rock.frlineagent.domain.config.AppConfig
+import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
 import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.domain.repository.SheetsRepository
-import org.slf4j.LoggerFactory
-import java.io.ByteArrayInputStream
+import org.fog_rock.frlineagent.infrastructure.internal.cloud.GoogleSheetsCloudRepository
+import org.fog_rock.frlineagent.infrastructure.internal.mock.MockSheetsRepository
 
 class GoogleSheetsRepositoryImpl(
-    private val config: AppConfig,
-    private val secretManagerProvider: SecretProvider
+    config: AppConfig,
+    secretManagerProvider: SecretProvider
 ) : SheetsRepository {
 
-    private val logger = LoggerFactory.getLogger(GoogleSheetsRepositoryImpl::class.java)
-
-    private val sheetsService: Sheets by lazy {
-        val credentialsJson = secretManagerProvider.getSecret(config.googleSheetsCredentialsKey)
-        val jsonFactory = GsonFactory.getDefaultInstance()
-        val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
-
-        val credentials = GoogleCredentials.fromStream(ByteArrayInputStream(credentialsJson.toByteArray()))
-            .createScoped(listOf(SheetsScopes.SPREADSHEETS_READONLY))
-
-        Sheets.Builder(httpTransport, jsonFactory, HttpCredentialsAdapter(credentials))
-            .setApplicationName(config.name)
-            .build()
+    private val repository: SheetsRepository = when (config.spreadsheetMode) {
+        ProviderMode.CLOUD -> GoogleSheetsCloudRepository(config, secretManagerProvider)
+        ProviderMode.MOCK -> MockSheetsRepository()
     }
 
-    override fun fetchSheetData(range: String): List<List<Any>> =
-        try {
-            val spreadsheetId = secretManagerProvider.getSecret(config.googleSheetsSpreadsheetIdKey)
-
-            val response = sheetsService.spreadsheets().values()
-                .get(spreadsheetId, range)
-                .execute()
-
-            response.getValues() ?: emptyList()
-        } catch (e: Exception) {
-            logger.error("Failed to fetch data from Google Sheets. Range: $range", e)
-            emptyList()
-        }
+    override fun fetchSheetData(range: String): List<List<Any>> = repository.fetchSheetData(range)
 }
