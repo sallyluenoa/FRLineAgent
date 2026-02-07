@@ -32,7 +32,7 @@ package "2. Service Layer" as Service #F5F5F5 {
     }
 
     interface SheetsRepository <<interface>> {
-        + fetchNotificationData(): List<NotificationContent>
+        + fetchSheetData(range: String): List<List<Any>>
     }
 
     interface LineClient <<interface>> {
@@ -55,7 +55,7 @@ package "3. Infrastructure Layer" as Infra #EEEEEE {
     class GoogleSheetsRepositoryImpl {
         - spreadsheetId: String
         - credentialsJson: String
-        + fetchNotificationData(): List<NotificationContent>
+        + fetchSheetData(range: String): List<List<Any>>
     }
     class LineMessagingClientImpl {
         - accessToken: String

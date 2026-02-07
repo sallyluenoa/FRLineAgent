@@ -40,7 +40,8 @@ group #Ivory Background Process
 
     alt #LightBlue Success (Data Found)
         GSheets --> Sheets: Return Data
-        Sheets --> Worker: Parsed Data
+        Sheets --> Worker: Raw Data
+        Worker -> Worker: Parse & Process Data
         Worker -> Worker: Compose Success Message
     else #LightPink Failure (API Error / No Data)
         GSheets --X Sheets: Error (404/500/Timeout)
