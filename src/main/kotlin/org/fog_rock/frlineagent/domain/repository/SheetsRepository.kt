@@ -16,8 +16,6 @@
 
 package org.fog_rock.frlineagent.domain.repository
 
-import org.fog_rock.frlineagent.domain.model.NotificationContent
-
 interface SheetsRepository {
-    fun fetchNotificationData(): List<NotificationContent>
+    fun fetchSheetData(range: String): List<List<Any>>
 }

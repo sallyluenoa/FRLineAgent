@@ -25,6 +25,9 @@ import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
  */
 class KtorAppConfig(config: ApplicationConfig) : AppConfig {
 
+    override val name: String =
+        config.property("app.name").getString()
+
     override val secretManagerMode: ProviderMode =
         getProviderMode(config, "app.provider.secret_manager")
 
@@ -34,8 +37,14 @@ class KtorAppConfig(config: ApplicationConfig) : AppConfig {
     override val lineApiMode: ProviderMode =
         getProviderMode(config, "app.provider.line_api")
 
-    override val googleCloudProjectId: String? =
-        config.propertyOrNull("app.google_cloud.project_id")?.getString()
+    override val googleCloudProjectId: String =
+        config.property("app.google_cloud.project_id").getString()
+
+    override val googleSheetsCredentialsKey: String =
+        config.property("app.google_sheets.credentials_key").getString()
+
+    override val googleSheetsSpreadsheetIdKey: String =
+        config.property("app.google_sheets.spreadsheet_id_key").getString()
 
     private fun getProviderMode(config: ApplicationConfig, path: String): ProviderMode =
         ProviderMode.convert(config.propertyOrNull(path)?.getString())

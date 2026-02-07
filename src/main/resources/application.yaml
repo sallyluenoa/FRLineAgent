@@ -21,9 +21,13 @@ ktor:
   deployment:
     port: 8080
 app:
+  name: "FRLineAgent"
   provider:
     secret_manager: "cloud"
     spreadsheet: "cloud"
     line_api: "cloud"
   google_cloud:
-    project_id:
+    project_id: ""
+  google_sheets:
+    credentials_key: ""
+    spreadsheet_id_key: ""

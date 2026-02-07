@@ -22,6 +22,9 @@ import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
  * An interface for managing the integration mode with external services.
  */
 interface AppConfig {
+    /** Application Name. */
+    val name: String
+
     /** Mode for Secret Manager. */
     val secretManagerMode: ProviderMode
     /** Mode for Spreadsheet. */
@@ -30,5 +33,10 @@ interface AppConfig {
     val lineApiMode: ProviderMode
 
     /** Google Cloud Project ID. */
-    val googleCloudProjectId: String?
+    val googleCloudProjectId: String
+
+    /** Key for Google Credentials in Secret Manager. */
+    val googleSheetsCredentialsKey: String
+    /** Key for Spreadsheet ID in Secret Manager. */
+    val googleSheetsSpreadsheetIdKey: String
 }

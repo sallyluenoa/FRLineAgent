@@ -25,7 +25,7 @@ import org.fog_rock.frlineagent.infrastructure.external.mock.MockSecretProvider
 class SecretManagerProvider(appConfig: AppConfig) : SecretProvider {
 
     private val provider: SecretProvider = when (appConfig.secretManagerMode) {
-        ProviderMode.CLOUD -> GoogleSecretProvider(appConfig.googleCloudProjectId ?: "")
+        ProviderMode.CLOUD -> GoogleSecretProvider(appConfig.googleCloudProjectId)
         ProviderMode.MOCK -> MockSecretProvider()
     }
 
