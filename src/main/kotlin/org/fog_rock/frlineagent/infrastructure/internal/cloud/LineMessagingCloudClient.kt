@@ -16,6 +16,7 @@
 
 package org.fog_rock.frlineagent.infrastructure.internal.cloud
 
+import com.linecorp.bot.client.base.Result
 import com.linecorp.bot.messaging.client.MessagingApiClient
 import com.linecorp.bot.messaging.model.PushMessageRequest
 import com.linecorp.bot.messaging.model.ReplyMessageRequest
@@ -38,25 +39,26 @@ internal class LineMessagingCloudClient(
         MessagingApiClient.builder(channelAccessToken).build()
     }
 
-    override fun reply(token: String, message: String): Result<Unit> =
+    override fun reply(token: String, message: String): kotlin.Result<Unit> =
         try {
             val replyMessageRequest = ReplyMessageRequest.Builder(token, listOf(TextMessage(message))).build()
-            val response = client.replyMessage(replyMessageRequest).get()
-            logger.info("Reply message sent: $response")
-            Result.success(Unit)
+            val response: Result<*> = client.replyMessage(replyMessageRequest).get()
+            logger.info("Reply message response: $response")
+            kotlin.Result.success(Unit)
         } catch (e: Exception) {
             logger.error("Failed to reply message", e)
-            Result.failure(e)
+            kotlin.Result.failure(e)
         }
 
-    override fun push(userId: String, message: String): Result<Unit> =
+    override fun push(userId: String, message: String): kotlin.Result<Unit> =
         try {
             val pushMessageRequest = PushMessageRequest.Builder(userId, listOf(TextMessage(message))).build()
-            val response = client.pushMessage(UUID.randomUUID(), pushMessageRequest).get()
-            logger.info("Push message sent: $response")
-            Result.success(Unit)
+            val response: Result<*> = client.pushMessage(UUID.randomUUID(), pushMessageRequest).get()
+
+            logger.info("Push message response: $response")
+            kotlin.Result.success(Unit)
         } catch (e: Exception) {
             logger.error("Failed to push message", e)
-            Result.failure(e)
+            kotlin.Result.failure(e)
         }
 }
