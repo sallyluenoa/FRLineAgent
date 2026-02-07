@@ -39,8 +39,6 @@ out/
 .env
 .env.*
 local.properties
-application-local.yaml
-application-local.conf
 
 # Logs
 *.log

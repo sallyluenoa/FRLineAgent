@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent
+package org.fog_rock.frlineagent.infrastructure.internal.mock
 
-import io.ktor.server.application.Application
-import org.fog_rock.frlineagent.plugins.configureDI
-import org.fog_rock.frlineagent.plugins.configureMonitoring
-import org.fog_rock.frlineagent.plugins.configureRouting
-import org.fog_rock.frlineagent.plugins.configureSerialization
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
-fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
-}
+class MockSheetsRepositoryTest {
 
-fun Application.module() {
-    configureDI()
-    configureSerialization()
-    configureMonitoring()
-    configureRouting()
+    @Test
+    fun testFetchSheetData() {
+        val repository = MockSheetsRepository()
+        val result = repository.fetchSheetData("A1:B2")
+
+        val expected = listOf(
+            listOf("Header1", "Header2"),
+            listOf("Value1", "Value2")
+        )
+        Assertions.assertEquals(expected, result)
+    }
 }

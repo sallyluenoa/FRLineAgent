@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent
+package org.fog_rock.frlineagent.plugins
 
 import io.ktor.server.application.Application
-import org.fog_rock.frlineagent.plugins.configureDI
-import org.fog_rock.frlineagent.plugins.configureMonitoring
-import org.fog_rock.frlineagent.plugins.configureRouting
-import org.fog_rock.frlineagent.plugins.configureSerialization
+import io.ktor.server.application.install
+import io.ktor.server.plugins.calllogging.CallLogging
+import io.ktor.server.request.path
+import org.slf4j.event.Level
 
-fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
-}
-
-fun Application.module() {
-    configureDI()
-    configureSerialization()
-    configureMonitoring()
-    configureRouting()
+fun Application.configureMonitoring() {
+    install(CallLogging) {
+        level = Level.INFO
+        filter { call -> call.request.path().startsWith("/") }
+    }
 }

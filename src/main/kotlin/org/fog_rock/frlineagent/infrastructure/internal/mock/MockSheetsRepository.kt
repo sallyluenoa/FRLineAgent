@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent
+package org.fog_rock.frlineagent.infrastructure.internal.mock
 
-import io.ktor.server.application.Application
-import org.fog_rock.frlineagent.plugins.configureDI
-import org.fog_rock.frlineagent.plugins.configureMonitoring
-import org.fog_rock.frlineagent.plugins.configureRouting
-import org.fog_rock.frlineagent.plugins.configureSerialization
+import org.fog_rock.frlineagent.domain.repository.SheetsRepository
+import org.slf4j.LoggerFactory
 
-fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
-}
+internal class MockSheetsRepository : SheetsRepository {
 
-fun Application.module() {
-    configureDI()
-    configureSerialization()
-    configureMonitoring()
-    configureRouting()
+    private val logger = LoggerFactory.getLogger(MockSheetsRepository::class.java)
+
+    override fun fetchSheetData(range: String): List<List<Any>> {
+        logger.info("Mock fetchSheetData called with range: $range")
+        return listOf(
+            listOf("Header1", "Header2"),
+            listOf("Value1", "Value2")
+        )
+    }
 }

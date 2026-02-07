@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent
+package org.fog_rock.frlineagent.infrastructure.internal.mock
 
-import io.ktor.server.application.Application
-import org.fog_rock.frlineagent.plugins.configureDI
-import org.fog_rock.frlineagent.plugins.configureMonitoring
-import org.fog_rock.frlineagent.plugins.configureRouting
-import org.fog_rock.frlineagent.plugins.configureSerialization
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
-fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
-}
+class LineMessagingMockClientTest {
 
-fun Application.module() {
-    configureDI()
-    configureSerialization()
-    configureMonitoring()
-    configureRouting()
+    private val client = LineMessagingMockClient()
+
+    @Test
+    fun testReply() {
+        val result = client.reply("token", "message")
+        assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun testPush() {
+        val result = client.push("userId", "message")
+        assertTrue(result.isSuccess)
+    }
 }

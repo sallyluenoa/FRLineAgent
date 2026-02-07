@@ -20,7 +20,7 @@ alt #LightPink Auth Error
     Routing --> Scheduler: 401 Unauthorized
 end
 
-Routing -> Sheets: Fetch notification data
+Routing -> Sheets: Fetch sheet data
 Sheets -> GSheets: Google Sheets API Call
 GSheets --> Sheets: Return Data
 
@@ -28,6 +28,9 @@ alt #LightPink Data / Sheets API Error
     Sheets --> Routing: Error / Empty
     Routing --> Scheduler: 500 Internal Server Error
 end
+
+Sheets --> Routing: Raw Data
+Routing -> Routing: Parse & Extract Notification Data
 
 == LINE API Interaction ==
 

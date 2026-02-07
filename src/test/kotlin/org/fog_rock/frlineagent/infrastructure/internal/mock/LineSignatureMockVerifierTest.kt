@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent
+package org.fog_rock.frlineagent.infrastructure.internal.mock
 
-import io.ktor.server.application.Application
-import io.ktor.server.application.install
-import io.ktor.server.plugins.calllogging.CallLogging
-import io.ktor.server.request.path
-import org.slf4j.event.Level
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
-fun Application.configureMonitoring() {
-    install(CallLogging) {
-        level = Level.INFO
-        filter { call -> call.request.path().startsWith("/") }
+class LineSignatureMockVerifierTest {
+
+    private val verifier = LineSignatureMockVerifier()
+
+    @Test
+    fun testVerify() {
+        val result = verifier.verify("body", "signature")
+        assertTrue(result)
     }
 }

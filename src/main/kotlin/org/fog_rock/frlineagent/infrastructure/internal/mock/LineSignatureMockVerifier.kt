@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent
+package org.fog_rock.frlineagent.infrastructure.internal.mock
 
-import io.ktor.server.application.Application
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.get
-import io.ktor.server.routing.routing
+import org.fog_rock.frlineagent.domain.service.SignatureVerifier
+import org.slf4j.LoggerFactory
 
-fun Application.configureRouting() {
-    routing {
-        get("/") {
-            call.respondText("Hello World!")
-        }
+internal class LineSignatureMockVerifier : SignatureVerifier {
+
+    private val logger = LoggerFactory.getLogger(LineSignatureMockVerifier::class.java)
+
+    override fun verify(body: String, signature: String): Boolean {
+        logger.info("Mock verify signature. body: $body, signature: $signature")
+        return true
     }
 }

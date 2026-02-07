@@ -16,12 +16,22 @@
 
 package org.fog_rock.frlineagent.infrastructure.service
 
+import org.fog_rock.frlineagent.domain.config.AppConfig
+import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
+import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.domain.service.SignatureVerifier
+import org.fog_rock.frlineagent.infrastructure.internal.cloud.LineSignatureCloudVerifier
+import org.fog_rock.frlineagent.infrastructure.internal.mock.LineSignatureMockVerifier
 
 class LineSignatureVerifierImpl(
-    private val channelSecret: String
+    appConfig: AppConfig,
+    secretManagerProvider: SecretProvider
 ) : SignatureVerifier {
-    override fun verify(body: String, signature: String): Boolean {
-        TODO("Not yet implemented")
+
+    private val verifier: SignatureVerifier = when (appConfig.lineApiMode) {
+        ProviderMode.CLOUD -> LineSignatureCloudVerifier(appConfig, secretManagerProvider)
+        ProviderMode.MOCK -> LineSignatureMockVerifier()
     }
+
+    override fun verify(body: String, signature: String): Boolean = verifier.verify(body, signature)
 }

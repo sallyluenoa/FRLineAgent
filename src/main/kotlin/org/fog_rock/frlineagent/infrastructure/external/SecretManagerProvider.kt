@@ -16,8 +16,18 @@
 
 package org.fog_rock.frlineagent.infrastructure.external
 
-class SecretManagerProvider {
-    fun getSecret(key: String): String {
-        TODO("Not yet implemented")
+import org.fog_rock.frlineagent.domain.config.AppConfig
+import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
+import org.fog_rock.frlineagent.domain.repository.SecretProvider
+import org.fog_rock.frlineagent.infrastructure.internal.cloud.GoogleSecretProvider
+import org.fog_rock.frlineagent.infrastructure.internal.mock.MockSecretProvider
+
+class SecretManagerProvider(appConfig: AppConfig) : SecretProvider {
+
+    private val provider: SecretProvider = when (appConfig.secretManagerMode) {
+        ProviderMode.CLOUD -> GoogleSecretProvider(appConfig.googleCloudProjectId)
+        ProviderMode.MOCK -> MockSecretProvider()
     }
+
+    override fun getSecret(key: String): String = provider.getSecret(key)
 }

@@ -16,16 +16,24 @@
 
 package org.fog_rock.frlineagent.infrastructure.service
 
+import org.fog_rock.frlineagent.domain.config.AppConfig
+import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
+import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.domain.service.LineClient
+import org.fog_rock.frlineagent.infrastructure.internal.cloud.LineMessagingCloudClient
+import org.fog_rock.frlineagent.infrastructure.internal.mock.LineMessagingMockClient
 
 class LineMessagingClientImpl(
-    private val accessToken: String
+    appConfig: AppConfig,
+    secretManagerProvider: SecretProvider
 ) : LineClient {
-    override fun reply(token: String, message: String): Result<Unit> {
-        TODO("Not yet implemented")
+
+    private val client: LineClient = when (appConfig.lineApiMode) {
+        ProviderMode.CLOUD -> LineMessagingCloudClient(appConfig, secretManagerProvider)
+        ProviderMode.MOCK -> LineMessagingMockClient()
     }
 
-    override fun push(userId: String, message: String): Result<Unit> {
-        TODO("Not yet implemented")
-    }
+    override fun reply(token: String, message: String): Result<Unit> = client.reply(token, message)
+
+    override fun push(userId: String, message: String): Result<Unit> = client.push(userId, message)
 }

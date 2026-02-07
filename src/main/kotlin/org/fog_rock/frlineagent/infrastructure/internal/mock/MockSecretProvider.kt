@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent
+package org.fog_rock.frlineagent.infrastructure.internal.mock
 
-import io.ktor.server.application.Application
-import org.fog_rock.frlineagent.plugins.configureDI
-import org.fog_rock.frlineagent.plugins.configureMonitoring
-import org.fog_rock.frlineagent.plugins.configureRouting
-import org.fog_rock.frlineagent.plugins.configureSerialization
+import org.fog_rock.frlineagent.domain.repository.SecretProvider
 
-fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
-}
+internal class MockSecretProvider : SecretProvider {
+    private val secrets = mapOf(
+        "LINE_CHANNEL_ACCESS_TOKEN" to "mock_line_channel_access_token",
+        "LINE_CHANNEL_SECRET" to "mock_line_channel_secret",
+        "SPREADSHEET_ID" to "mock_spreadsheet_id",
+        "GOOGLE_CREDENTIALS_JSON" to "{}"
+    )
 
-fun Application.module() {
-    configureDI()
-    configureSerialization()
-    configureMonitoring()
-    configureRouting()
+    override fun getSecret(key: String): String =
+        secrets[key] ?: throw IllegalArgumentException("Secret key `$key` not found in mock.")
 }

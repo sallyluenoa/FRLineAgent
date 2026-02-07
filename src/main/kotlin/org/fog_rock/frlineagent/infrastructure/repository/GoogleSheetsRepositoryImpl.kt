@@ -16,14 +16,22 @@
 
 package org.fog_rock.frlineagent.infrastructure.repository
 
-import org.fog_rock.frlineagent.domain.model.NotificationContent
+import org.fog_rock.frlineagent.domain.config.AppConfig
+import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
+import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.domain.repository.SheetsRepository
+import org.fog_rock.frlineagent.infrastructure.internal.cloud.GoogleSheetsCloudRepository
+import org.fog_rock.frlineagent.infrastructure.internal.mock.MockSheetsRepository
 
 class GoogleSheetsRepositoryImpl(
-    private val spreadsheetId: String,
-    private val credentialsJson: String
+    config: AppConfig,
+    secretManagerProvider: SecretProvider
 ) : SheetsRepository {
-    override fun fetchNotificationData(): List<NotificationContent> {
-        TODO("Not yet implemented")
+
+    private val repository: SheetsRepository = when (config.spreadsheetMode) {
+        ProviderMode.CLOUD -> GoogleSheetsCloudRepository(config, secretManagerProvider)
+        ProviderMode.MOCK -> MockSheetsRepository()
     }
+
+    override fun fetchSheetData(range: String): List<List<Any>> = repository.fetchSheetData(range)
 }
