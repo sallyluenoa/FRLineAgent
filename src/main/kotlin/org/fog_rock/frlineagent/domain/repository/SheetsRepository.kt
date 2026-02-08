@@ -16,6 +16,15 @@
 
 package org.fog_rock.frlineagent.domain.repository
 
+/**
+ * Interface for accessing Google Sheets data.
+ */
 interface SheetsRepository {
+    /**
+     * Fetches data from a specified range in the spreadsheet.
+     *
+     * @param range The A1 notation of the range to fetch.
+     * @return A list of rows, where each row is a list of cell values.
+     */
     fun fetchSheetData(range: String): List<List<Any>>
 }

@@ -16,7 +16,25 @@
 
 package org.fog_rock.frlineagent.domain.service
 
+/**
+ * Interface for LINE Messaging API client.
+ */
 interface LineClient {
+    /**
+     * Replies to a message.
+     *
+     * @param token The reply token.
+     * @param message The message to reply.
+     * @return Result<Unit> indicating success or failure.
+     */
     fun reply(token: String, message: String): Result<Unit>
+
+    /**
+     * Pushes a message to a user.
+     *
+     * @param userId The user ID to push the message to.
+     * @param message The message to push.
+     * @return Result<Unit> indicating success or failure.
+     */
     fun push(userId: String, message: String): Result<Unit>
 }

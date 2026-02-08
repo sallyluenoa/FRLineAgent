@@ -16,6 +16,12 @@
 
 package org.fog_rock.frlineagent.domain.model
 
+/**
+ * Data class representing the content of a notification.
+ *
+ * @property userId The user ID to send the notification to.
+ * @property message The message content of the notification.
+ */
 data class NotificationContent(
     val userId: String,
     val message: String
