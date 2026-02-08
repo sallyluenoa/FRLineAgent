@@ -16,18 +16,119 @@
 
 package org.fog_rock.frlineagent.domain.service
 
+import org.fog_rock.frlineagent.domain.model.NotificationContent
 import org.fog_rock.frlineagent.domain.repository.SheetsRepository
+import org.slf4j.LoggerFactory
 
+/**
+ * Service class for handling LINE Bot operations.
+ */
 class LineBotService(
     private val sheetsRepo: SheetsRepository,
     private val lineClient: LineClient,
     private val verifier: SignatureVerifier
 ) {
-    fun handleWebhook(body: String, signature: String): Result<Unit> {
-        TODO("Not yet implemented")
+    private val logger = LoggerFactory.getLogger(LineBotService::class.java)
+
+    companion object {
+        // Default range for scheduled push notifications (UserId, Message)
+        private const val SHEET_RANGE_PUSH = "Sheet1!A:B"
+        // Default range for webhook data retrieval
+        private const val SHEET_RANGE_WEBHOOK = "Sheet1!C:D"
     }
 
+    /**
+     * Handles the webhook request from LINE Platform.
+     *
+     * @param body The request body.
+     * @param signature The signature from the X-Line-Signature header.
+     * @return Result<Unit> indicating success or failure.
+     */
+    fun handleWebhook(body: String, signature: String): Result<Unit> {
+        // 1. Verify Signature
+        if (!verifier.verify(body, signature)) {
+            val msg = "Invalid signature."
+            logger.error(msg)
+            return Result.failure(SecurityException(msg))
+        }
+
+        // 2. Parse & Process Data
+        // Extract replyToken from the body (simplified parsing)
+        val replyToken = extractReplyToken(body)
+        if (replyToken == null) {
+            logger.warn("Reply token not found in body. Skipping reply.")
+            return Result.success(Unit)
+        }
+
+        return try {
+            // 3. Request Data from Sheets
+            val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_WEBHOOK)
+
+            // 4. Compose Success Message
+            val message = if (sheetData.isNotEmpty()) {
+                "Received webhook. Found ${sheetData.size} rows in sheets."
+            } else {
+                "Received webhook. No data found in sheets."
+            }
+
+            // 5. Call Reply API
+            lineClient.reply(replyToken, message)
+        } catch (e: Exception) {
+            logger.error("Error processing webhook", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Executes the scheduled push notification logic.
+     *
+     * @return Result<Unit> indicating success or failure.
+     */
     fun executeScheduledPush(): Result<Unit> {
-        TODO("Not yet implemented")
+        return try {
+            // 1. Fetch sheet data
+            val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_PUSH)
+
+            if (sheetData.isEmpty()) {
+                logger.info("No data found for scheduled push.")
+                return Result.success(Unit)
+            }
+
+            // 2. Parse & Extract Notification Data
+            val notifications = sheetData.mapNotNull { row ->
+                if (row.size >= 2) {
+                    NotificationContent(
+                        userId = row[0].toString(),
+                        message = row[1].toString()
+                    )
+                } else {
+                    null
+                }
+            }
+
+            // 3. Call Push Message API
+            notifications.forEach { notification ->
+                lineClient.push(notification.userId, notification.message)
+                    .onFailure { e ->
+                        logger.error("Failed to push message to ${notification.userId}", e)
+                        throw e
+                    }
+            }
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            logger.error("Error executing scheduled push", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Extracts the replyToken from the JSON body using Regex.
+     * Note: This is a simplified extraction and assumes the standard LINE event structure.
+     */
+    private fun extractReplyToken(json: String): String? {
+        val regex = """"replyToken"\s*:\s*"([^"]+)"""".toRegex()
+        val matchResult = regex.find(json)
+        return matchResult?.groupValues?.get(1)
     }
 }
