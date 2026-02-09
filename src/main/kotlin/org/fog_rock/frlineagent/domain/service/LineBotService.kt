@@ -126,15 +126,28 @@ class LineBotService(
             }
 
             // 3. Call Push Message API
+            var failureCount = 0
+            val totalCount = notifications.size
+
             notifications.forEach { notification ->
                 lineClient.push(notification.userId, notification.message)
+                    .onSuccess {
+                        logger.info("Successfully pushed message to ${notification.userId}")
+                    }
                     .onFailure { e ->
                         logger.error("Failed to push message to ${notification.userId}", e)
-                        throw e
+                        failureCount++
                     }
             }
 
-            Result.success(Unit)
+            if (failureCount > 0) {
+                val errorMsg = "Push notifications completed with errors. Failed: $failureCount / Total: $totalCount"
+                logger.error(errorMsg)
+                Result.failure(RuntimeException(errorMsg))
+            } else {
+                logger.info("All $totalCount push notifications sent successfully.")
+                Result.success(Unit)
+            }
         } catch (e: Exception) {
             logger.error("Error executing scheduled push", e)
             Result.failure(e)
