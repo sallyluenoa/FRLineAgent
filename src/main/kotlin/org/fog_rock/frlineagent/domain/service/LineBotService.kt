@@ -16,6 +16,11 @@
 
 package org.fog_rock.frlineagent.domain.service
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import org.fog_rock.frlineagent.domain.model.LineWebhookEvent
 import org.fog_rock.frlineagent.domain.model.NotificationContent
 import org.fog_rock.frlineagent.domain.repository.SheetsRepository
 import org.slf4j.LoggerFactory
@@ -29,6 +34,8 @@ class LineBotService(
     private val verifier: SignatureVerifier
 ) {
     private val logger = LoggerFactory.getLogger(LineBotService::class.java)
+    private val scope = CoroutineScope(Dispatchers.Default)
+    private val json = Json { ignoreUnknownKeys = true }
 
     companion object {
         // Default range for scheduled push notifications (UserId, Message)
@@ -53,30 +60,42 @@ class LineBotService(
         }
 
         // 2. Parse & Process Data
-        // Extract replyToken from the body (simplified parsing)
-        val replyToken = extractReplyToken(body)
-        if (replyToken == null) {
-            logger.warn("Reply token not found in body. Skipping reply.")
-            return Result.success(Unit)
-        }
-
-        return try {
-            // 3. Request Data from Sheets
-            val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_WEBHOOK)
-
-            // 4. Compose Success Message
-            val message = if (sheetData.isNotEmpty()) {
-                "Received webhook. Found ${sheetData.size} rows in sheets."
-            } else {
-                "Received webhook. No data found in sheets."
-            }
-
-            // 5. Call Reply API
-            lineClient.reply(replyToken, message)
+        val webhookEvent = try {
+            json.decodeFromString<LineWebhookEvent>(body)
         } catch (e: Exception) {
-            logger.error("Error processing webhook", e)
-            Result.failure(e)
+            logger.error("Failed to parse webhook event.", e)
+            return Result.failure(e)
         }
+
+        // Launch background worker asynchronously
+        scope.launch {
+            webhookEvent.events.forEach { event ->
+                val replyToken = event.replyToken
+                if (replyToken != null) {
+                    try {
+                        // 3. Request Data from Sheets
+                        val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_WEBHOOK)
+
+                        // 4. Compose Success Message
+                        val message = if (sheetData.isNotEmpty()) {
+                            "Received webhook. Found ${sheetData.size} rows in sheets."
+                        } else {
+                            "Received webhook. No data found in sheets."
+                        }
+
+                        // 5. Call Reply API
+                        lineClient.reply(replyToken, message)
+                    } catch (e: Exception) {
+                        logger.error("Error processing webhook in background", e)
+                    }
+                } else {
+                    logger.info("Event does not have a replyToken. Type: ${event.type}")
+                }
+            }
+        }
+
+        // Return success immediately to acknowledge receipt
+        return Result.success(Unit)
     }
 
     /**
@@ -120,15 +139,5 @@ class LineBotService(
             logger.error("Error executing scheduled push", e)
             Result.failure(e)
         }
-    }
-
-    /**
-     * Extracts the replyToken from the JSON body using Regex.
-     * Note: This is a simplified extraction and assumes the standard LINE event structure.
-     */
-    private fun extractReplyToken(json: String): String? {
-        val regex = """"replyToken"\s*:\s*"([^"]+)"""".toRegex()
-        val matchResult = regex.find(json)
-        return matchResult?.groupValues?.get(1)
     }
 }
