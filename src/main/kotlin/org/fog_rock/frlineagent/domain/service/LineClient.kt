@@ -30,11 +30,11 @@ interface LineClient {
     fun reply(token: String, message: String): Result<Unit>
 
     /**
-     * Pushes a message to a user.
+     * Pushes a message to a user, group, or room.
      *
-     * @param userId The user ID to push the message to.
+     * @param to The ID of the recipient (user, group, or room).
      * @param message The message to push.
      * @return Result<Unit> indicating success or failure.
      */
-    fun push(userId: String, message: String): Result<Unit>
+    fun push(to: String, message: String): Result<Unit>
 }

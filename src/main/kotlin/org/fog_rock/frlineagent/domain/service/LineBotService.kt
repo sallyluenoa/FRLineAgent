@@ -38,7 +38,7 @@ class LineBotService(
     private val json = Json { ignoreUnknownKeys = true }
 
     companion object {
-        // Default range for scheduled push notifications (UserId, Message)
+        // Default range for scheduled push notifications (To, Message)
         private const val SHEET_RANGE_PUSH = "Sheet1!A:B"
         // Default range for webhook data retrieval
         private const val SHEET_RANGE_WEBHOOK = "Sheet1!C:D"
@@ -117,7 +117,7 @@ class LineBotService(
             val notifications = sheetData.mapNotNull { row ->
                 if (row.size >= 2) {
                     NotificationContent(
-                        userId = row[0].toString(),
+                        to = row[0].toString(),
                         message = row[1].toString()
                     )
                 } else {
@@ -130,12 +130,12 @@ class LineBotService(
             val totalCount = notifications.size
 
             notifications.forEach { notification ->
-                lineClient.push(notification.userId, notification.message)
+                lineClient.push(notification.to, notification.message)
                     .onSuccess {
-                        logger.info("Successfully pushed message to ${notification.userId}")
+                        logger.info("Successfully pushed message to ${notification.to}")
                     }
                     .onFailure { e ->
-                        logger.error("Failed to push message to ${notification.userId}", e)
+                        logger.error("Failed to push message to ${notification.to}", e)
                         failureCount++
                     }
             }

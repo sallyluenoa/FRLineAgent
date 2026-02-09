@@ -28,8 +28,8 @@ internal class LineMessagingMockClient : LineClient {
         return Result.success(Unit)
     }
 
-    override fun push(userId: String, message: String): Result<Unit> {
-        logger.info("Mock push message sent. userId: $userId, message: $message")
+    override fun push(to: String, message: String): Result<Unit> {
+        logger.info("Mock push message sent. to: $to, message: $message")
         return Result.success(Unit)
     }
 }
