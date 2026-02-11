@@ -16,7 +16,9 @@
 
 package org.fog_rock.frlineagent.domain.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * Data class representing the LINE Webhook event object.
@@ -31,49 +33,73 @@ data class LineWebhookEvent(
 ) {
     /**
      * Data class representing a single event in the webhook payload.
-     *
-     * @property type The type of the event.
-     * @property replyToken The reply token for replying to the event.
-     * @property source The source of the event.
-     * @property timestamp The time of the event in milliseconds.
-     * @property mode The mode of the channel (active or standby).
-     * @property webhookEventId The ID of the webhook event.
-     * @property deliveryContext The delivery context.
      */
     @Serializable
     data class Event(
-        val type: String,
+        @SerialName("type") private val _type: String,
         val replyToken: String? = null,
         val source: Source? = null,
         val timestamp: Long,
         val mode: String,
         val webhookEventId: String,
-        val deliveryContext: DeliveryContext
-    )
+        val deliveryContext: DeliveryContext,
+        val message: Message? = null
+    ) {
+        @Transient
+        val eventType: EventType = EventType.fromString(_type)
+    }
 
     /**
      * Data class representing the source of the event.
-     *
-     * @property type The type of the source (user, group, room).
-     * @property userId The ID of the user.
-     * @property groupId The ID of the group.
-     * @property roomId The ID of the room.
      */
     @Serializable
     data class Source(
-        val type: String,
+        @SerialName("type") private val _type: String,
         val userId: String? = null,
         val groupId: String? = null,
         val roomId: String? = null
-    )
+    ) {
+        @Transient
+        val sourceType: SourceType = SourceType.fromString(_type)
+    }
 
     /**
      * Data class representing the delivery context.
-     *
-     * @property isRedelivery Whether the event is a redelivery.
      */
     @Serializable
     data class DeliveryContext(
         val isRedelivery: Boolean
+    )
+
+    /**
+     * Data class representing a message object in the event.
+     */
+    @Serializable
+    data class Message(
+        val id: String,
+        @SerialName("type") private val _type: String,
+        val text: String? = null,
+        val mention: Mention? = null
+    ) {
+        @Transient
+        val messageType: MessageType = MessageType.fromString(_type)
+    }
+
+    /**
+     * Data class representing a mention object in the message.
+     */
+    @Serializable
+    data class Mention(
+        val mentionees: List<Mentionee>
+    )
+
+    /**
+     * Data class representing a mentionee object.
+     */
+    @Serializable
+    data class Mentionee(
+        val index: Int,
+        val length: Int,
+        val userId: String
     )
 }

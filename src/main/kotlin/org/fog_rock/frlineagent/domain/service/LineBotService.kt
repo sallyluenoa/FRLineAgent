@@ -20,8 +20,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import org.fog_rock.frlineagent.domain.model.EventType
 import org.fog_rock.frlineagent.domain.model.LineWebhookEvent
+import org.fog_rock.frlineagent.domain.model.MessageType
 import org.fog_rock.frlineagent.domain.model.NotificationContent
+import org.fog_rock.frlineagent.domain.model.SourceType
 import org.fog_rock.frlineagent.domain.repository.SheetsRepository
 import org.slf4j.LoggerFactory
 
@@ -70,26 +73,34 @@ class LineBotService(
         // Launch background worker asynchronously
         scope.launch {
             webhookEvent.events.forEach { event ->
-                val replyToken = event.replyToken
-                if (replyToken != null) {
-                    try {
-                        // 3. Request Data from Sheets
-                        val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_WEBHOOK)
+                if (shouldReply(event, webhookEvent.destination)) {
+                    val replyToken = event.replyToken
+                    if (replyToken != null) {
+                        try {
+                            // 3. Request Data from Sheets
+                            val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_WEBHOOK)
 
-                        // 4. Compose Success Message
-                        val message = if (sheetData.isNotEmpty()) {
-                            "Received webhook. Found ${sheetData.size} rows in sheets."
-                        } else {
-                            "Received webhook. No data found in sheets."
+                            // 4. Compose Success Message
+                            val sourceId = when (event.source?.sourceType) {
+                                SourceType.USER -> "UserId: ${event.source.userId}"
+                                SourceType.GROUP -> "GroupId: ${event.source.groupId}"
+                                else -> "SourceId: unknown"
+                            }
+                            val baseMessage = if (sheetData.isNotEmpty()) {
+                                "Received webhook. Found ${sheetData.size} rows in sheets."
+                            } else {
+                                "Received webhook. No data found in sheets."
+                            }
+                            val message = "$baseMessage ($sourceId)"
+
+                            // 5. Call Reply API
+                            lineClient.reply(replyToken, message)
+                        } catch (e: Exception) {
+                            logger.error("Error processing webhook in background", e)
                         }
-
-                        // 5. Call Reply API
-                        lineClient.reply(replyToken, message)
-                    } catch (e: Exception) {
-                        logger.error("Error processing webhook in background", e)
+                    } else {
+                        logger.info("Event does not have a replyToken. Type: ${event.eventType}")
                     }
-                } else {
-                    logger.info("Event does not have a replyToken. Type: ${event.type}")
                 }
             }
         }
@@ -151,6 +162,24 @@ class LineBotService(
         } catch (e: Exception) {
             logger.error("Error executing scheduled push", e)
             Result.failure(e)
+        }
+    }
+
+    private fun shouldReply(event: LineWebhookEvent.Event, botId: String): Boolean {
+        if (event.eventType != EventType.MESSAGE || event.message?.messageType != MessageType.TEXT) {
+            return false
+        }
+
+        return when (event.source?.sourceType) {
+            SourceType.USER -> true
+            SourceType.GROUP -> {
+                val isMentioned = event.message.mention?.mentionees?.any { it.userId == botId } ?: false
+                if (!isMentioned) {
+                    logger.info("Skipping reply in group chat as bot was not mentioned. GroupId: ${event.source.groupId}")
+                }
+                isMentioned
+            }
+            else -> false
         }
     }
 }
