@@ -55,14 +55,14 @@ class LineBotService(
      * @return Result<Unit> indicating success or failure.
      */
     fun handleWebhook(body: String, signature: String): Result<Unit> {
-        // 1. Verify Signature
+        // Verify Signature
         if (!verifier.verify(body, signature)) {
-            val msg = "Invalid signature."
-            logger.error(msg)
-            return Result.failure(SecurityException(msg))
+            val e = SecurityException("Invalid signature.")
+            logger.error(e.message)
+            return Result.failure(e)
         }
 
-        // 2. Parse & Process Data
+        // Parse & Process Data
         val webhookEvent = try {
             json.decodeFromString<LineWebhookEvent>(body)
         } catch (e: Exception) {
@@ -72,37 +72,7 @@ class LineBotService(
 
         // Launch background worker asynchronously
         scope.launch {
-            webhookEvent.events.forEach { event ->
-                if (shouldReply(event, webhookEvent.destination)) {
-                    val replyToken = event.replyToken
-                    if (replyToken != null) {
-                        try {
-                            // 3. Request Data from Sheets
-                            val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_WEBHOOK)
-
-                            // 4. Compose Success Message
-                            val sourceId = when (event.source?.sourceType) {
-                                SourceType.USER -> "UserId: ${event.source.userId}"
-                                SourceType.GROUP -> "GroupId: ${event.source.groupId}"
-                                else -> "SourceId: unknown"
-                            }
-                            val baseMessage = if (sheetData.isNotEmpty()) {
-                                "Received webhook. Found ${sheetData.size} rows in sheets."
-                            } else {
-                                "Received webhook. No data found in sheets."
-                            }
-                            val message = "$baseMessage ($sourceId)"
-
-                            // 5. Call Reply API
-                            lineClient.reply(replyToken, message)
-                        } catch (e: Exception) {
-                            logger.error("Error processing webhook in background", e)
-                        }
-                    } else {
-                        logger.info("Event does not have a replyToken. Type: ${event.eventType}")
-                    }
-                }
-            }
+            webhookEvent.events.forEach { reply(it, webhookEvent.destination) }
         }
 
         // Return success immediately to acknowledge receipt
@@ -115,71 +85,96 @@ class LineBotService(
      * @return Result<Unit> indicating success or failure.
      */
     fun executeScheduledPush(): Result<Unit> {
-        return try {
-            // 1. Fetch sheet data
-            val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_PUSH)
-
-            if (sheetData.isEmpty()) {
-                logger.info("No data found for scheduled push.")
-                return Result.success(Unit)
-            }
-
-            // 2. Parse & Extract Notification Data
-            val notifications = sheetData.mapNotNull { row ->
-                if (row.size >= 2) {
-                    NotificationContent(
-                        to = row[0].toString(),
-                        message = row[1].toString()
-                    )
-                } else {
-                    null
-                }
-            }
-
-            // 3. Call Push Message API
-            var failureCount = 0
-            val totalCount = notifications.size
-
-            notifications.forEach { notification ->
-                lineClient.push(notification.to, notification.message)
-                    .onSuccess {
-                        logger.info("Successfully pushed message to ${notification.to}")
-                    }
-                    .onFailure { e ->
-                        logger.error("Failed to push message to ${notification.to}", e)
-                        failureCount++
-                    }
-            }
-
-            if (failureCount > 0) {
-                val errorMsg = "Push notifications completed with errors. Failed: $failureCount / Total: $totalCount"
-                logger.error(errorMsg)
-                Result.failure(RuntimeException(errorMsg))
-            } else {
-                logger.info("All $totalCount push notifications sent successfully.")
-                Result.success(Unit)
-            }
-        } catch (e: Exception) {
-            logger.error("Error executing scheduled push", e)
-            Result.failure(e)
+        // Fetch sheet data
+        val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_PUSH)
+        if (sheetData.isEmpty()) {
+            logger.info("No data found for scheduled push.")
+            return Result.success(Unit)
         }
+
+        // Parse & Extract Notification Data
+        val notifications = sheetData.mapNotNull { row ->
+            if (row.size >= 2) {
+                NotificationContent(
+                    to = row[0].toString(),
+                    message = row[1].toString()
+                )
+            } else {
+                null
+            }
+        }
+
+        // Call Push Message API
+        val failureCount = pushAll(notifications)
+
+        if (failureCount > 0) {
+            val e = RuntimeException(
+                "Push notifications completed with errors. Failed: $failureCount / Total: ${notifications.size}"
+            )
+            logger.error(e.message)
+            return Result.failure(e)
+        }
+
+        logger.info("All ${notifications.size} push notifications sent successfully.")
+        return Result.success(Unit)
+    }
+
+    private fun reply(event: LineWebhookEvent.Event, botId: String) {
+        if (!shouldReply(event, botId)) {
+            logger.info("Should not reply the event.")
+            return
+        }
+        val replyToken = event.replyToken ?: run {
+            logger.info("Event does not have the replyToken.")
+            return
+        }
+        // Request Data from Sheets
+        val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_WEBHOOK)
+        if (sheetData.isEmpty()) {
+            logger.info("Not found the reply message.")
+            return
+        }
+        // Compose Success Message
+        val sourceId = when (event.source?.sourceType) {
+            SourceType.USER -> "UserId: ${event.source.userId}"
+            SourceType.GROUP -> "GroupId: ${event.source.groupId}"
+            else -> "SourceId: unknown"
+        }
+        val message = "Reply message: ${sheetData[0][0]} ($sourceId)"
+
+        // Call Reply API
+        lineClient.reply(replyToken, message)
     }
 
     private fun shouldReply(event: LineWebhookEvent.Event, botId: String): Boolean {
-        if (event.eventType != EventType.MESSAGE || event.message?.messageType != MessageType.TEXT) {
+        if (event.eventType != EventType.MESSAGE) {
+            logger.info("The event type is not message. eventType: ${event.eventType}")
             return false
         }
-
+        if (event.message?.messageType != MessageType.TEXT) {
+            logger.info("The message type is not text. messageType: ${event.message?.messageType}")
+            return false
+        }
+        logger.info("sourceType: ${event.source?.sourceType}")
         return when (event.source?.sourceType) {
             SourceType.USER -> true
-            SourceType.GROUP -> {
-                val isMentioned = event.message.mention?.mentionees?.any { it.userId == botId } ?: false
-                if (!isMentioned) {
-                    logger.info("Skipping reply in group chat as bot was not mentioned. GroupId: ${event.source.groupId}")
-                }
-                isMentioned
-            }
+            SourceType.GROUP -> event.message.mention?.mentionees?.any { it.userId == botId } ?: false
             else -> false
         }
+    }
+
+    private fun pushAll(notifications: List<NotificationContent>): Int {
+        var failureCount = 0
+        notifications.forEach { notification ->
+            lineClient.push(notification.to, notification.message)
+                .onSuccess {
+                    logger.info("Successfully pushed message to ${notification.to}")
+                }
+                .onFailure { e ->
+                    logger.error("Failed to push message to ${notification.to}", e)
+                    failureCount++
+                }
+        }
+        return failureCount
     }
 }
