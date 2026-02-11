@@ -18,7 +18,7 @@ package org.fog_rock.frlineagent.infrastructure.config
 
 import io.ktor.server.config.ApplicationConfig
 import org.fog_rock.frlineagent.domain.config.AppConfig
-import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
+import org.fog_rock.frlineagent.domain.config.ProviderMode
 
 /**
  * A class that reads AppConfig from a Ktor configuration file.

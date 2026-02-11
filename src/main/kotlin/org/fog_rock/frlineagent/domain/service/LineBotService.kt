@@ -20,11 +20,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import org.fog_rock.frlineagent.domain.model.EventType
-import org.fog_rock.frlineagent.domain.model.LineWebhookEvent
-import org.fog_rock.frlineagent.domain.model.MessageType
-import org.fog_rock.frlineagent.domain.model.NotificationContent
-import org.fog_rock.frlineagent.domain.model.SourceType
+import org.fog_rock.frlineagent.domain.model.webhook.EventType
+import org.fog_rock.frlineagent.domain.model.webhook.LineWebhookEvent
+import org.fog_rock.frlineagent.domain.model.webhook.MessageType
+import org.fog_rock.frlineagent.domain.model.notification.NotificationContent
+import org.fog_rock.frlineagent.domain.model.webhook.SourceType
 import org.fog_rock.frlineagent.domain.repository.SheetsRepository
 import org.slf4j.LoggerFactory
 

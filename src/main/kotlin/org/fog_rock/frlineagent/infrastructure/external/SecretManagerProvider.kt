@@ -17,7 +17,7 @@
 package org.fog_rock.frlineagent.infrastructure.external
 
 import org.fog_rock.frlineagent.domain.config.AppConfig
-import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
+import org.fog_rock.frlineagent.domain.config.ProviderMode
 import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.infrastructure.internal.cloud.GoogleSecretProvider
 import org.fog_rock.frlineagent.infrastructure.internal.mock.MockSecretProvider

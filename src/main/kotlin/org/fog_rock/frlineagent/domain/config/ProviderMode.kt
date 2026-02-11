@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.domain.config.enums
+package org.fog_rock.frlineagent.domain.config
 
 /**
  * Provider mode.

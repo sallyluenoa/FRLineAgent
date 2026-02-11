@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.domain.model
+package org.fog_rock.frlineagent.domain.model.webhook
 
 import kotlinx.serialization.Serializable
 
