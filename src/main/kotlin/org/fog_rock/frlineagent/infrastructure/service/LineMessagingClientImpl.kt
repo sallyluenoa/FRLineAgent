@@ -35,5 +35,5 @@ class LineMessagingClientImpl(
 
     override fun reply(token: String, message: String): Result<Unit> = client.reply(token, message)
 
-    override fun push(userId: String, message: String): Result<Unit> = client.push(userId, message)
+    override fun push(to: String, message: String): Result<Unit> = client.push(to, message)
 }
