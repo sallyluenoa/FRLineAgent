@@ -22,7 +22,7 @@ import io.mockk.mockkConstructor
 import io.mockk.unmockkAll
 import io.mockk.verify
 import org.fog_rock.frlineagent.domain.config.AppConfig
-import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
+import org.fog_rock.frlineagent.domain.config.ProviderMode
 import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.infrastructure.internal.cloud.LineSignatureCloudVerifier
 import org.fog_rock.frlineagent.infrastructure.internal.mock.LineSignatureMockVerifier

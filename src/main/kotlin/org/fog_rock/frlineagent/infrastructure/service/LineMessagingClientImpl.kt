@@ -17,7 +17,7 @@
 package org.fog_rock.frlineagent.infrastructure.service
 
 import org.fog_rock.frlineagent.domain.config.AppConfig
-import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
+import org.fog_rock.frlineagent.domain.config.ProviderMode
 import org.fog_rock.frlineagent.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.domain.service.LineClient
 import org.fog_rock.frlineagent.infrastructure.internal.cloud.LineMessagingCloudClient
@@ -35,5 +35,5 @@ class LineMessagingClientImpl(
 
     override fun reply(token: String, message: String): Result<Unit> = client.reply(token, message)
 
-    override fun push(userId: String, message: String): Result<Unit> = client.push(userId, message)
+    override fun push(to: String, message: String): Result<Unit> = client.push(to, message)
 }

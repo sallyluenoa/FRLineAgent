@@ -37,11 +37,11 @@ package "2. Service Layer" as Service #F5F5F5 {
 
     interface LineClient <<interface>> {
         + reply(token: String, message: String): Result<Unit>
-        + push(userId: String, message: String): Result<Unit>
+        + push(to: String, message: String): Result<Unit>
     }
 
     class NotificationContent <<data>> {
-        + userId: String
+        + to: String
         + message: String
     }
 }
@@ -60,7 +60,7 @@ package "3. Infrastructure Layer" as Infra #EEEEEE {
     class LineMessagingClientImpl {
         - accessToken: String
         + reply(token: String, message: String): Result<Unit>
-        + push(userId: String, message: String): Result<Unit>
+        + push(to: String, message: String): Result<Unit>
     }
     class SecretManagerProvider {
         + getSecret(key: String): String

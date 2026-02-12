@@ -16,8 +16,6 @@
 
 package org.fog_rock.frlineagent.domain.config
 
-import org.fog_rock.frlineagent.domain.config.enums.ProviderMode
-
 /**
  * An interface for managing the integration mode with external services.
  */

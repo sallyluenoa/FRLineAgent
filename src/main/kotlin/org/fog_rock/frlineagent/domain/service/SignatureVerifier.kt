@@ -16,6 +16,16 @@
 
 package org.fog_rock.frlineagent.domain.service
 
+/**
+ * Interface for verifying the signature of a request.
+ */
 interface SignatureVerifier {
+    /**
+     * Verifies the signature of the request body.
+     *
+     * @param body The request body.
+     * @param signature The signature to verify.
+     * @return True if the signature is valid, false otherwise.
+     */
     fun verify(body: String, signature: String): Boolean
 }

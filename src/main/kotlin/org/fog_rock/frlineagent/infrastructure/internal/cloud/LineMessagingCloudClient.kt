@@ -50,9 +50,9 @@ internal class LineMessagingCloudClient(
             kotlin.Result.failure(e)
         }
 
-    override fun push(userId: String, message: String): kotlin.Result<Unit> =
+    override fun push(to: String, message: String): kotlin.Result<Unit> =
         try {
-            val pushMessageRequest = PushMessageRequest.Builder(userId, listOf(TextMessage(message))).build()
+            val pushMessageRequest = PushMessageRequest.Builder(to, listOf(TextMessage(message))).build()
             val response: Result<*> = client.pushMessage(UUID.randomUUID(), pushMessageRequest).get()
 
             logger.info("Push message response: $response")

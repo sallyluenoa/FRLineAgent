@@ -14,9 +14,15 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.domain.model
+package org.fog_rock.frlineagent.domain.model.notification
 
+/**
+ * Data class representing the content of a notification.
+ *
+ * @property to The ID of the recipient (user, group, or room).
+ * @property message The message content of the notification.
+ */
 data class NotificationContent(
-    val userId: String,
+    val to: String,
     val message: String
 )
