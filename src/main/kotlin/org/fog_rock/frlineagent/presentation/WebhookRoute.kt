@@ -16,13 +16,54 @@
 
 package org.fog_rock.frlineagent.presentation
 
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
+import io.ktor.server.request.header
+import io.ktor.server.request.receiveText
+import io.ktor.server.response.respond
 import org.fog_rock.frlineagent.domain.service.LineBotService
+import org.slf4j.LoggerFactory
 
+/**
+ * Route handler for LINE Webhook requests.
+ */
 class WebhookRoute(
     private val service: LineBotService
 ) {
+    private val logger = LoggerFactory.getLogger(WebhookRoute::class.java)
+
+    /**
+     * Handles the webhook request.
+     *
+     * @param call The application call.
+     */
     suspend fun handle(call: ApplicationCall) {
-        TODO("Not yet implemented")
+        val signature = call.request.header("X-Line-Signature") ?: run {
+            logger.error("Missing X-Line-Signature header.")
+            call.respond(HttpStatusCode.BadRequest, "Missing X-Line-Signature header.")
+            return
+        }
+
+        val body = try {
+            call.receiveText()
+        } catch (e: Exception) {
+            logger.error("Failed to receive request body.", e)
+            call.respond(HttpStatusCode.InternalServerError, "Failed to receive request body.")
+            return
+        }
+
+        service.handleWebhook(body, signature)
+            .onSuccess {
+                call.respond(HttpStatusCode.OK)
+            }
+            .onFailure { e ->
+                if (e is SecurityException) {
+                    logger.warn("Invalid signature.", e)
+                    call.respond(HttpStatusCode.Unauthorized, "Invalid signature.")
+                } else {
+                    logger.error("Failed to handle webhook.", e)
+                    call.respond(HttpStatusCode.InternalServerError, "Internal Server Error")
+                }
+            }
     }
 }
