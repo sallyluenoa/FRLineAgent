@@ -17,14 +17,22 @@
 package org.fog_rock.frlineagent.plugins
 
 import io.ktor.server.application.Application
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
+import org.fog_rock.frlineagent.presentation.PushTriggerRoute
+import org.fog_rock.frlineagent.presentation.WebhookRoute
+import org.koin.ktor.ext.inject
 
 fun Application.configureRouting() {
+    val webhookRoute by inject<WebhookRoute>()
+    val pushTriggerRoute by inject<PushTriggerRoute>()
+
     routing {
-        get("/") {
-            call.respondText("Hello World!")
+        post("/webhook") {
+            webhookRoute.handle(call)
+        }
+        post("/push") {
+            pushTriggerRoute.handle(call)
         }
     }
 }
