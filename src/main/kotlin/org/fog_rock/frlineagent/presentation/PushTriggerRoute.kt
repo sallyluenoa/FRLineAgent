@@ -30,6 +30,11 @@ class PushTriggerRoute(
 ) {
     private val logger = LoggerFactory.getLogger(PushTriggerRoute::class.java)
 
+    companion object {
+        private const val MESSAGE_OK = "OK"
+        private const val MESSAGE_FAILED = "Failed to execute scheduled push."
+    }
+
     /**
      * Handles the push trigger request.
      *
@@ -39,11 +44,11 @@ class PushTriggerRoute(
         service.executeScheduledPush()
             .onSuccess {
                 logger.info("Successfully executed scheduled push.")
-                call.respond(HttpStatusCode.OK)
+                call.respond(HttpStatusCode.OK, MESSAGE_OK)
             }
             .onFailure { e ->
-                logger.error("Failed to execute scheduled push.", e)
-                call.respond(HttpStatusCode.InternalServerError, "Failed to execute scheduled push.")
+                logger.error(MESSAGE_FAILED, e)
+                call.respond(HttpStatusCode.InternalServerError, MESSAGE_FAILED)
             }
     }
 }

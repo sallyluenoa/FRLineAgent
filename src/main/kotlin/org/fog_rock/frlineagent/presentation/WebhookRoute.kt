@@ -32,37 +32,47 @@ class WebhookRoute(
 ) {
     private val logger = LoggerFactory.getLogger(WebhookRoute::class.java)
 
+    companion object {
+        private const val HEADER_X_LINE_SIGNATURE = "X-Line-Signature"
+        private const val MESSAGE_OK = "OK"
+        private const val MESSAGE_MISSING_HEADER = "Missing X-Line-Signature header."
+        private const val MESSAGE_FAILED_RECEIVE_BODY = "Failed to receive request body."
+        private const val MESSAGE_INVALID_SIGNATURE = "Invalid signature."
+        private const val MESSAGE_INTERNAL_SERVER_ERROR = "Internal Server Error"
+    }
+
     /**
      * Handles the webhook request.
      *
      * @param call The application call.
      */
     suspend fun handle(call: ApplicationCall) {
-        val signature = call.request.header("X-Line-Signature") ?: run {
-            logger.error("Missing X-Line-Signature header.")
-            call.respond(HttpStatusCode.BadRequest, "Missing X-Line-Signature header.")
+        val signature = call.request.header(HEADER_X_LINE_SIGNATURE) ?: run {
+            logger.error(MESSAGE_MISSING_HEADER)
+            call.respond(HttpStatusCode.BadRequest, MESSAGE_MISSING_HEADER)
             return
         }
 
         val body = try {
             call.receiveText()
         } catch (e: Exception) {
-            logger.error("Failed to receive request body.", e)
-            call.respond(HttpStatusCode.InternalServerError, "Failed to receive request body.")
+            logger.error(MESSAGE_FAILED_RECEIVE_BODY, e)
+            call.respond(HttpStatusCode.InternalServerError, MESSAGE_FAILED_RECEIVE_BODY)
             return
         }
 
         service.handleWebhook(body, signature)
             .onSuccess {
-                call.respond(HttpStatusCode.OK)
+                logger.info("Successfully handled webhook.")
+                call.respond(HttpStatusCode.OK, MESSAGE_OK)
             }
             .onFailure { e ->
                 if (e is SecurityException) {
-                    logger.warn("Invalid signature.", e)
-                    call.respond(HttpStatusCode.Unauthorized, "Invalid signature.")
+                    logger.warn(MESSAGE_INVALID_SIGNATURE, e)
+                    call.respond(HttpStatusCode.Unauthorized, MESSAGE_INVALID_SIGNATURE)
                 } else {
                     logger.error("Failed to handle webhook.", e)
-                    call.respond(HttpStatusCode.InternalServerError, "Internal Server Error")
+                    call.respond(HttpStatusCode.InternalServerError, MESSAGE_INTERNAL_SERVER_ERROR)
                 }
             }
     }
