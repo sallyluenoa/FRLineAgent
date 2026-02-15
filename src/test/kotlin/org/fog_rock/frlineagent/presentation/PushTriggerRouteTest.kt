@@ -26,9 +26,9 @@ import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
 import org.fog_rock.frlineagent.domain.service.LineBotService
+import org.junit.jupiter.api.Test
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
-import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class PushTriggerRouteTest {
