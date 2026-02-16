@@ -21,13 +21,47 @@ This project is built using the following technologies:
 - Gradle (optional, wrapper is included)
 
 ### Running Locally
-To run the server locally, execute the following command:
+To run the server locally with development-specific configurations (e.g., `application-local.yaml`), execute the following command. This command passes the necessary configuration files to the Ktor application.
 
 ```bash
-./gradlew run
+./gradlew run --args='-config=src/main/resources/application.yaml -config=src/main/resources/application-local.yaml'
 ```
 
 The server will start and listen on `http://localhost:8080` by default.
+
+### Testing Endpoints Locally
+
+Once the server is running, you can use a tool like `curl` to test the API endpoints from another terminal window.
+
+**Note for Windows Users:** If you are using PowerShell, the `curl` command is an alias for `Invoke-WebRequest`, which has a different syntax. To use the standard curl executable, you must specify `curl.exe`.
+
+#### `/push` Endpoint
+
+This endpoint triggers the scheduled push notification logic. It does not require a request body.
+
+```bash
+# Using -v for verbose output helps in debugging
+# For Windows PowerShell, use curl.exe
+curl -v -X POST http://localhost:8080/push
+```
+
+A successful request will return an HTTP `200 OK` status.
+
+#### `/webhook` Endpoint
+
+This endpoint simulates a webhook event from the LINE Platform. It requires a JSON body and a signature header. Sample request bodies are available in the `src/test/resources/request/webhook/` directory.
+
+```bash
+# Example using the sample for a user message
+# For Windows PowerShell, use curl.exe
+curl -v -X POST http://localhost:8080/webhook \
+  -H "Content-Type: application/json" \
+  -H "X-Line-Signature: dummy_signature" \
+  -d @src/test/resources/request/webhook/user_message.json
+```
+
+- **`X-Line-Signature`**: The signature verification is enabled on the server. Using a `dummy_signature` as shown will correctly result in an HTTP `401 Unauthorized` response, which confirms that the signature validation logic is working as expected.
+- **`-d @...`**: This syntax loads the request body from the specified file. You can replace `user_message.json` with `group_mention.json` to test the group mention scenario.
 
 ### Running Tests
 To run the unit tests, execute:
