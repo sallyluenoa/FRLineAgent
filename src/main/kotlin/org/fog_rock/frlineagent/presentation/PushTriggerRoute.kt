@@ -16,13 +16,39 @@
 
 package org.fog_rock.frlineagent.presentation
 
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
+import io.ktor.server.response.respond
 import org.fog_rock.frlineagent.domain.service.LineBotService
+import org.slf4j.LoggerFactory
 
+/**
+ * Route handler for push trigger requests.
+ */
 class PushTriggerRoute(
     private val service: LineBotService
 ) {
+    private val logger = LoggerFactory.getLogger(PushTriggerRoute::class.java)
+
+    companion object {
+        private const val MESSAGE_OK = "OK"
+        private const val MESSAGE_FAILED = "Failed to execute scheduled push."
+    }
+
+    /**
+     * Handles the push trigger request.
+     *
+     * @param call The application call.
+     */
     suspend fun handle(call: ApplicationCall) {
-        TODO("Not yet implemented")
+        service.executeScheduledPush()
+            .onSuccess {
+                logger.info("Successfully executed scheduled push.")
+                call.respond(HttpStatusCode.OK, MESSAGE_OK)
+            }
+            .onFailure { e ->
+                logger.error(MESSAGE_FAILED, e)
+                call.respond(HttpStatusCode.InternalServerError, MESSAGE_FAILED)
+            }
     }
 }

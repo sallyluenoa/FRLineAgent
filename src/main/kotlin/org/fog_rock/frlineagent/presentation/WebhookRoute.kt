@@ -16,13 +16,64 @@
 
 package org.fog_rock.frlineagent.presentation
 
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
+import io.ktor.server.request.header
+import io.ktor.server.request.receiveText
+import io.ktor.server.response.respond
 import org.fog_rock.frlineagent.domain.service.LineBotService
+import org.slf4j.LoggerFactory
 
+/**
+ * Route handler for LINE Webhook requests.
+ */
 class WebhookRoute(
     private val service: LineBotService
 ) {
+    private val logger = LoggerFactory.getLogger(WebhookRoute::class.java)
+
+    companion object {
+        private const val HEADER_X_LINE_SIGNATURE = "X-Line-Signature"
+        private const val MESSAGE_OK = "OK"
+        private const val MESSAGE_MISSING_HEADER = "Missing X-Line-Signature header."
+        private const val MESSAGE_FAILED_RECEIVE_BODY = "Failed to receive request body."
+        private const val MESSAGE_INVALID_SIGNATURE = "Invalid signature."
+        private const val MESSAGE_INTERNAL_SERVER_ERROR = "Internal Server Error"
+    }
+
+    /**
+     * Handles the webhook request.
+     *
+     * @param call The application call.
+     */
     suspend fun handle(call: ApplicationCall) {
-        TODO("Not yet implemented")
+        val signature = call.request.header(HEADER_X_LINE_SIGNATURE) ?: run {
+            logger.error(MESSAGE_MISSING_HEADER)
+            call.respond(HttpStatusCode.BadRequest, MESSAGE_MISSING_HEADER)
+            return
+        }
+
+        val body = try {
+            call.receiveText()
+        } catch (e: Exception) {
+            logger.error(MESSAGE_FAILED_RECEIVE_BODY, e)
+            call.respond(HttpStatusCode.InternalServerError, MESSAGE_FAILED_RECEIVE_BODY)
+            return
+        }
+
+        service.handleWebhook(body, signature)
+            .onSuccess {
+                logger.info("Successfully handled webhook.")
+                call.respond(HttpStatusCode.OK, MESSAGE_OK)
+            }
+            .onFailure { e ->
+                if (e is SecurityException) {
+                    logger.warn(MESSAGE_INVALID_SIGNATURE, e)
+                    call.respond(HttpStatusCode.Unauthorized, MESSAGE_INVALID_SIGNATURE)
+                } else {
+                    logger.error("Failed to handle webhook.", e)
+                    call.respond(HttpStatusCode.InternalServerError, MESSAGE_INTERNAL_SERVER_ERROR)
+                }
+            }
     }
 }
