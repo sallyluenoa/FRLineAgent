@@ -6,7 +6,7 @@
       "message": {
         "type": "text",
         "id": "12345678901234",
-        "text": "こんにちは"
+        "text": "Hello World!"
       },
       "webhookEventId": "01GXXXXXXXXXXXXXXXXX",
       "deliveryContext": {

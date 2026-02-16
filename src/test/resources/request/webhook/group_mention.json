@@ -6,7 +6,7 @@
       "message": {
         "type": "text",
         "id": "12345678901234",
-        "text": "@BotName テストメッセージ",
+        "text": "@BotName This is the test message.",
         "mention": {
           "mentionees": [
             {
