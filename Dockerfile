@@ -44,7 +44,7 @@ WORKDIR /app
 
 # Copy only the built JAR file from the build stage
 # Note: Ensure the JAR filename pattern matches your build/libs output
-COPY --from=build /app/build/libs/FRLineAgent-*-all.jar app.jar
+COPY --from=build /app/build/libs/FRLineAgent-*-all.jar /app/app.jar
 
 # Cloud Run injects the PORT environment variable at runtime
 # We default to 8080 but the app should listen on $PORT
@@ -53,4 +53,4 @@ EXPOSE 8080
 
 # Run the application with optimized memory settings for container environments
 # MaxRAMPercentage ensures the JVM respects the container's memory limits
-CMD ["java", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]
+CMD ["java", "-XX:MaxRAMPercentage=75.0", "-jar", "/app/app.jar"]
