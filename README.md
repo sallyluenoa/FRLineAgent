@@ -29,6 +29,20 @@ To run the server locally with development-specific configurations (e.g., `appli
 
 The server will start and listen on `http://localhost:8080` by default.
 
+### Running with Docker (Local)
+To verify the Docker image and run the application in a containerized environment locally, use Docker Compose. This setup mounts the local `src/main/resources` directory, allowing the container to use `application-local.yaml`.
+
+```bash
+# Build the image and start the container
+docker compose up --build
+```
+
+To stop the container and remove the created resources:
+
+```bash
+docker compose down
+```
+
 ### Testing Endpoints Locally
 
 Once the server is running, you can use a tool like `curl` to test the API endpoints from another terminal window.

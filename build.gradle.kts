@@ -51,3 +51,7 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
+tasks.getByName<Jar>("shadowJar") {
+    archiveFileName.set("${project.name}-${project.version}-all.jar")
+}
