@@ -27,10 +27,10 @@ app:
     spreadsheet: "cloud"
     line_api: "cloud"
   google_cloud:
-    project_id: ""
+    project_id: ${PROJECT_ID}
   google_sheets:
-    credentials_key: ""
-    spreadsheet_id_key: ""
+    credentials_key: "GOOGLE_API_CREDENTIALS"
+    spreadsheet_id_key: "GOOGLE_SPREADSHEET_ID"
   line_bot:
-    channel_access_token_key: ""
-    channel_secret_key: ""
+    channel_access_token_key: "LINE_CHANNEL_ACCESS_TOKEN"
+    channel_secret_key: "LINE_CHANNEL_SECRET"
