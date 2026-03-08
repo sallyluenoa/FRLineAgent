@@ -41,7 +41,7 @@ class KtorAppConfig(config: ApplicationConfig) : AppConfig {
         config.property("app.google_cloud.project_id").getString()
 
     override val googleSheetsCredentialsKey: String =
-        config.property("app.google_sheets.credentials_key").getString()
+        config.property("app.google_cloud.credentials_key").getString()
 
     override val googleSheetsSpreadsheetIdKey: String =
         config.property("app.google_sheets.spreadsheet_id_key").getString()
