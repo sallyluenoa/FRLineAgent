@@ -42,6 +42,10 @@ RUN ./gradlew --no-daemon build -x test
 FROM amazoncorretto:21-alpine
 WORKDIR /app
 
+# Define the Google Cloud Project Number with a default for local development
+ARG PROJECT_NUMBER=111111111111
+ENV PROJECT_NUMBER=${PROJECT_NUMBER}
+
 # Copy only the built JAR file from the build stage
 # Note: Ensure the JAR filename pattern matches your build/libs output
 COPY --from=build /app/build/libs/FRLineAgent-*-all.jar /app/app.jar
