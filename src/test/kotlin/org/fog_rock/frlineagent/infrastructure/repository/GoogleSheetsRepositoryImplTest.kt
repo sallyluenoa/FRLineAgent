@@ -42,7 +42,7 @@ class GoogleSheetsRepositoryImplTest {
         val appConfig = mockk<AppConfig>()
         val secretProvider = mockk<SecretProvider>()
         every { appConfig.spreadsheetMode } returns ProviderMode.CLOUD
-        every { appConfig.googleSheetsCredentialsKey } returns "test-credentials-key"
+        every { appConfig.googleCloudCredentialsKey } returns "test-credentials-key"
         every { appConfig.googleSheetsSpreadsheetIdKey } returns "test-spreadsheet-id-key"
 
         mockkConstructor(GoogleSheetsCloudRepository::class)
