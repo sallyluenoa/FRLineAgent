@@ -34,13 +34,13 @@ import org.junit.jupiter.api.assertThrows
 
 class GoogleSecretProviderTest {
 
-    private val projectId = "test-project-id"
+    private val projectNumber = "111111111111"
     private lateinit var googleSecretProvider: GoogleSecretProvider
     private lateinit var mockClient: SecretManagerServiceClient
 
     @BeforeEach
     fun setUp() {
-        googleSecretProvider = GoogleSecretProvider(projectId)
+        googleSecretProvider = GoogleSecretProvider(projectNumber)
         mockClient = mockk(relaxed = true)
 
         mockkStatic(SecretManagerServiceClient::class)
@@ -56,7 +56,7 @@ class GoogleSecretProviderTest {
     fun testGetSecret_success() {
         val key = "test-key"
         val secretValue = "test-secret-value"
-        val secretVersionName = SecretVersionName.of(projectId, key, "latest")
+        val secretVersionName = SecretVersionName.of(projectNumber, key, "latest")
 
         val mockResponse = mockk<AccessSecretVersionResponse>()
         val mockPayload = mockk<SecretPayload>()
@@ -72,7 +72,7 @@ class GoogleSecretProviderTest {
         assertEquals(secretValue, result)
         verify {
             mockClient.accessSecretVersion(match<SecretVersionName> {
-                it.project == projectId && it.secret == key && it.secretVersion == "latest"
+                it.project == projectNumber && it.secret == key && it.secretVersion == "latest"
             })
             mockClient.close()
         }

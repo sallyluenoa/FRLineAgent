@@ -40,7 +40,7 @@ class SecretManagerProviderTest {
     fun testInit_cloudMode() {
         val appConfig = mockk<AppConfig>()
         every { appConfig.secretManagerMode } returns ProviderMode.CLOUD
-        every { appConfig.googleCloudProjectId } returns "test-project"
+        every { appConfig.googleCloudProjectNumber } returns "111111111111"
 
         mockkConstructor(GoogleSecretProvider::class)
         every { anyConstructed<GoogleSecretProvider>().getSecret("test-key") } returns "cloud-secret"
