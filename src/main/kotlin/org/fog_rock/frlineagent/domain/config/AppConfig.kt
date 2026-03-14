@@ -31,7 +31,7 @@ interface AppConfig {
     val lineApiMode: ProviderMode
 
     /** Google Cloud Project ID. */
-    val googleCloudProjectId: String
+    val googleCloudProjectNumber: String
 
     /** Key for Google Credentials in Secret Manager. */
     val googleSheetsCredentialsKey: String

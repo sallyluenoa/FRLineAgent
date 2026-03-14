@@ -37,8 +37,8 @@ class KtorAppConfig(config: ApplicationConfig) : AppConfig {
     override val lineApiMode: ProviderMode =
         getProviderMode(config, "app.provider.line_api")
 
-    override val googleCloudProjectId: String =
-        config.property("app.google_cloud.project_id").getString()
+    override val googleCloudProjectNumber: String =
+        config.property("app.google_cloud.project_number").getString()
 
     override val googleSheetsCredentialsKey: String =
         config.property("app.google_cloud.credentials_key").getString()
