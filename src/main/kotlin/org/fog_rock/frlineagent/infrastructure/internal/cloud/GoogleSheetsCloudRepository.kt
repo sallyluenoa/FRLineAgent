@@ -36,7 +36,7 @@ internal class GoogleSheetsCloudRepository(
     private val logger = LoggerFactory.getLogger(GoogleSheetsCloudRepository::class.java)
 
     private val sheetsService: Sheets by lazy {
-        val credentialsJson = secretManagerProvider.getSecret(config.googleSheetsCredentialsKey)
+        val credentialsJson = secretManagerProvider.getSecret(config.googleCloudCredentialsKey)
         val jsonFactory = GsonFactory.getDefaultInstance()
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
 

@@ -33,8 +33,8 @@ The server will start and listen on `http://localhost:8080` by default.
 To verify the Docker image and run the application in a containerized environment locally, use Docker Compose. This setup mounts the local `src/main/resources` directory, allowing the container to use `application-local.yaml`.
 
 ```bash
-# Build the image and start the container
-docker compose up --build
+# Build the image and start the container with the environment variables
+PROJECT_NUMBER=111111111111 docker compose up --build
 ```
 
 To stop the container and remove the created resources:

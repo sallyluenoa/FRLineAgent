@@ -45,7 +45,7 @@ class GoogleSheetsCloudRepositoryTest {
         val appConfig = mockk<AppConfig>()
         val secretProvider = mockk<SecretProvider>()
 
-        every { appConfig.googleSheetsCredentialsKey } returns "creds-key"
+        every { appConfig.googleCloudCredentialsKey } returns "creds-key"
         every { appConfig.name } returns "TestApp"
         // Mocking getSecret to throw an exception to simulate failure during initialization or execution
         every { secretProvider.getSecret("creds-key") } throws RuntimeException("Secret fetch failed")

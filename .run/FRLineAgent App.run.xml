@@ -1,5 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="FRLineAgent App" type="KtorApplicationConfigurationType" factoryName="Ktor">
+    <envs>
+      <env name="PROJECT_NUMBER" value="111111111111" />
+    </envs>
     <option name="MAIN_CLASS_NAME" value="io.ktor.server.netty.EngineMain" />
     <module name="FRLineAgent.main" />
     <option name="PROGRAM_PARAMETERS" value="-config=src/main/resources/application.yaml -config=src/main/resources/application-local.yaml" />

@@ -24,6 +24,7 @@ on:
 env:
   SERVICE: 'fr-line-agent'
   PROJECT_ID: '${{ vars.GCP_PROJECT_ID_DEV }}'
+  PROJECT_NUMBER: '${{ vars.GCP_PROJECT_NUMBER_DEV }}'
   REGION: '${{ vars.GCP_REGION_DEV }}'
   WORKLOAD_IDENTITY_PROVIDER: '${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER_DEV }}'
   SERVICE_ACCOUNT: '${{ secrets.GCP_SERVICE_ACCOUNT_DEV }}'
@@ -76,4 +77,4 @@ jobs:
           region: '${{ env.REGION }}'
           image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ github.sha }}'
           env_vars: |
-            PROJECT_ID=${{ env.PROJECT_ID }}
+            PROJECT_NUMBER=${{ env.PROJECT_NUMBER }}
