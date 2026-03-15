@@ -20,6 +20,7 @@ on:
   push:
     branches:
       - main
+      - issues/23
 
 env:
   SERVICE: 'fr-line-agent'
