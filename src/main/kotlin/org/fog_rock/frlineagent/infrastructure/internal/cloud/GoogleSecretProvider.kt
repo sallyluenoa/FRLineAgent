@@ -19,14 +19,30 @@ package org.fog_rock.frlineagent.infrastructure.internal.cloud
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient
 import com.google.cloud.secretmanager.v1.SecretVersionName
 import org.fog_rock.frlineagent.domain.repository.SecretProvider
+import org.slf4j.LoggerFactory
 
 internal class GoogleSecretProvider(private val projectNumber: String) : SecretProvider {
+    private val logger = LoggerFactory.getLogger(GoogleSecretProvider::class.java)
+
     override fun getSecret(key: String): String {
         if (projectNumber.isBlank()) {
             throw IllegalStateException("Google Cloud Project Number is not set.")
         }
+
+        logger.info("projectNumber: $projectNumber")
+        logger.info("key: $key")
+
+        val trimmedProjectNumber = projectNumber.trim()
+        val trimmedKey = key.trim()
+
+        logger.info("trimmedProjectNumber: $trimmedProjectNumber")
+        logger.info("trimmedKey: $trimmedKey")
+
+        val debugPath = "projects/$trimmedProjectNumber/secrets/$trimmedKey/versions/latest"
+        logger.info("DEBUG: Accessing SecretManager with path: [$debugPath]")
+
         SecretManagerServiceClient.create().use { client ->
-            val secretVersionName = SecretVersionName.of(projectNumber, key, "latest")
+            val secretVersionName = SecretVersionName.of(trimmedProjectNumber, trimmedKey, "latest")
             val response = client.accessSecretVersion(secretVersionName)
             return response.payload.data.toStringUtf8()
         }
