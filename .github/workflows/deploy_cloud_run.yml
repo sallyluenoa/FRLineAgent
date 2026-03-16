@@ -26,8 +26,8 @@ env:
   PROJECT_ID: '${{ vars.GCP_PROJECT_ID_DEV }}'
   PROJECT_NUMBER: '${{ vars.GCP_PROJECT_NUMBER_DEV }}'
   REGION: '${{ vars.GCP_REGION_DEV }}'
+  SERVICE_ACCOUNT: '${{ vars.GCP_SERVICE_ACCOUNT_DEV }}'
   WORKLOAD_IDENTITY_PROVIDER: '${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER_DEV }}'
-  SERVICE_ACCOUNT: '${{ secrets.GCP_SERVICE_ACCOUNT_DEV }}'
 
 jobs:
   deploy:
@@ -75,6 +75,7 @@ jobs:
           project_id: '${{ env.PROJECT_ID }}'
           service: '${{ env.SERVICE }}'
           region: '${{ env.REGION }}'
+          service_account: '${{ env.SERVICE_ACCOUNT }}'
           image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ github.sha }}'
           env_vars: |
             PROJECT_NUMBER=${{ env.PROJECT_NUMBER }}
