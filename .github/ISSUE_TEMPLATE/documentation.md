@@ -1,7 +1,7 @@
 ---
-name: Feature Implementation
-about: Request or suggest new feature
-title: '[documentation]'
+name: Documentation
+about: Document designs and specifications
+title: '[Documentation]'
 labels: 'documentation'
 assignees: 'sallyluenoa'
 
