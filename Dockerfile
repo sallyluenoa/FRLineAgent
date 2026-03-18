@@ -32,7 +32,7 @@ RUN chmod +x gradlew
 RUN ./gradlew --no-daemon dependencies
 
 # Copy the source code
-COPY src src
+COPY fr-line-agent-sample-app/src src
 
 # Build the application FAT JAR, skipping tests for faster CI/CD
 RUN ./gradlew --no-daemon build -x test
