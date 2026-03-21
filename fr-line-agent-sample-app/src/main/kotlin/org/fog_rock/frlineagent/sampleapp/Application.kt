@@ -16,7 +16,7 @@
 
 package org.fog_rock.frlineagent.sampleapp
 
-import io.ktor.server.application.*
+import io.ktor.server.application.Application
 import org.fog_rock.frlineagent.sampleapp.plugins.configureDI
 import org.fog_rock.frlineagent.sampleapp.plugins.configureMonitoring
 import org.fog_rock.frlineagent.sampleapp.plugins.configureRouting

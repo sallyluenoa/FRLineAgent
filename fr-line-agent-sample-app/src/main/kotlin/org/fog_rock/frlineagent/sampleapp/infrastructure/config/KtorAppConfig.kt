@@ -16,7 +16,7 @@
 
 package org.fog_rock.frlineagent.sampleapp.infrastructure.config
 
-import io.ktor.server.config.*
+import io.ktor.server.config.ApplicationConfig
 import org.fog_rock.frlineagent.sampleapp.domain.config.AppConfig
 import org.fog_rock.frlineagent.core.domain.config.ProviderMode
 

@@ -18,10 +18,9 @@ package org.fog_rock.frlineagent.core.infrastructure.cloud
 
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient
 import com.google.cloud.secretmanager.v1.SecretVersionName
-import org.fog_rock.frlineagent.sampleapp.domain.repository.SecretProvider
-import kotlin.use
+import org.fog_rock.frlineagent.core.domain.repository.SecretProvider
 
-internal class GoogleSecretProvider(private val projectNumber: String) : SecretProvider {
+class GoogleSecretProvider(private val projectNumber: String) : SecretProvider {
     override fun getSecret(key: String): String {
         if (projectNumber.isBlank()) {
             throw IllegalStateException("Google Cloud Project Number is not set.")

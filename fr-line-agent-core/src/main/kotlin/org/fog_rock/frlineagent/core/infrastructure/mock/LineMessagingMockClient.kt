@@ -16,10 +16,10 @@
 
 package org.fog_rock.frlineagent.core.infrastructure.mock
 
-import org.fog_rock.frlineagent.sampleapp.domain.service.LineClient
+import org.fog_rock.frlineagent.core.domain.service.LineClient
 import org.slf4j.LoggerFactory
 
-internal class LineMessagingMockClient : LineClient {
+class LineMessagingMockClient : LineClient {
 
     private val logger = LoggerFactory.getLogger(LineMessagingMockClient::class.java)
 

@@ -14,16 +14,27 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.sampleapp.domain.config
-
-import org.fog_rock.frlineagent.core.domain.config.ProviderMode
+package org.fog_rock.frlineagent.core.domain.config
 
 /**
  * An interface for managing the integration mode with external services.
  */
-interface AppConfig : org.fog_rock.frlineagent.core.domain.config.AppConfig {
-    /** Mode for Spreadsheet. */
-    val spreadsheetMode: ProviderMode
-    /** Key for Spreadsheet ID in Secret Manager. */
-    val googleSheetsSpreadsheetIdKey: String
+interface AppConfig {
+    /** Application Name. */
+    val name: String
+
+    /** Mode for Secret Manager. */
+    val secretManagerMode: ProviderMode
+    /** Mode for LINE API. */
+    val lineApiMode: ProviderMode
+
+    /** Google Cloud Project ID. */
+    val googleCloudProjectNumber: String
+    /** Key for Google Credentials in Secret Manager. */
+    val googleCloudCredentialsKey: String
+
+    /** Key for LINE Channel Access Token in Secret Manager. */
+    val lineBotChannelAccessTokenKey: String
+    /** Key for LINE Channel Secret in Secret Manager. */
+    val lineBotChannelSecretKey: String
 }

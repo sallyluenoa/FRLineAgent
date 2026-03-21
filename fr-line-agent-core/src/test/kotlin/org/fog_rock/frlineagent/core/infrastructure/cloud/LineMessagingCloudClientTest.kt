@@ -21,14 +21,18 @@ import com.linecorp.bot.messaging.model.PushMessageRequest
 import com.linecorp.bot.messaging.model.PushMessageResponse
 import com.linecorp.bot.messaging.model.ReplyMessageRequest
 import com.linecorp.bot.messaging.model.ReplyMessageResponse
-import io.mockk.*
-import org.fog_rock.frlineagent.sampleapp.domain.config.AppConfig
-import org.fog_rock.frlineagent.sampleapp.domain.repository.SecretProvider
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkAll
+import io.mockk.verify
+import org.fog_rock.frlineagent.core.domain.config.AppConfig
+import org.fog_rock.frlineagent.core.domain.repository.SecretProvider
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
 class LineMessagingCloudClientTest {

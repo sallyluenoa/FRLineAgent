@@ -17,9 +17,13 @@
 package org.fog_rock.frlineagent.core.infrastructure.cloud
 
 import com.linecorp.bot.parser.LineSignatureValidator
-import io.mockk.*
-import org.fog_rock.frlineagent.sampleapp.domain.config.AppConfig
-import org.fog_rock.frlineagent.sampleapp.domain.repository.SecretProvider
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkConstructor
+import io.mockk.unmockkAll
+import io.mockk.verify
+import org.fog_rock.frlineagent.core.domain.config.AppConfig
+import org.fog_rock.frlineagent.core.domain.repository.SecretProvider
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue

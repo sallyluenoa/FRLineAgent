@@ -16,7 +16,11 @@
 
 package org.fog_rock.frlineagent.sampleapp.infrastructure.external
 
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkConstructor
+import io.mockk.unmockkAll
+import io.mockk.verify
 import org.fog_rock.frlineagent.sampleapp.domain.config.AppConfig
 import org.fog_rock.frlineagent.core.domain.config.ProviderMode
 import org.fog_rock.frlineagent.core.infrastructure.cloud.GoogleSecretProvider

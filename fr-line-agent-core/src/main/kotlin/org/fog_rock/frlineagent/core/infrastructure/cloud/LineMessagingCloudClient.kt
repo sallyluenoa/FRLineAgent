@@ -20,13 +20,13 @@ import com.linecorp.bot.messaging.client.MessagingApiClient
 import com.linecorp.bot.messaging.model.PushMessageRequest
 import com.linecorp.bot.messaging.model.ReplyMessageRequest
 import com.linecorp.bot.messaging.model.TextMessage
-import org.fog_rock.frlineagent.sampleapp.domain.config.AppConfig
-import org.fog_rock.frlineagent.sampleapp.domain.repository.SecretProvider
-import org.fog_rock.frlineagent.sampleapp.domain.service.LineClient
+import org.fog_rock.frlineagent.core.domain.config.AppConfig
+import org.fog_rock.frlineagent.core.domain.repository.SecretProvider
+import org.fog_rock.frlineagent.core.domain.service.LineClient
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
-internal class LineMessagingCloudClient(
+class LineMessagingCloudClient(
     private val appConfig: AppConfig,
     private val secretManagerProvider: SecretProvider
 ) : LineClient {

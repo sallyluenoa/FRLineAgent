@@ -4,7 +4,7 @@
       <env name="PROJECT_NUMBER" value="111111111111" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="io.ktor.server.netty.EngineMain" />
-    <module name="FRLineAgent.main" />
+    <module name="FRLineAgent.fr-line-agent-sample-app.main" />
     <option name="PROGRAM_PARAMETERS" value="-config=src/main/resources/application.yaml -config=src/main/resources/application-local.yaml" />
     <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
     <option name="alternativeJrePath" />
