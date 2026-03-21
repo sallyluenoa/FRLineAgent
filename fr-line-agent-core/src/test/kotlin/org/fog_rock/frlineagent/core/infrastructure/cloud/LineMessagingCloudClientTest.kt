@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.sampleapp.infrastructure.internal.cloud
+package org.fog_rock.frlineagent.core.infrastructure.cloud
 
-import com.linecorp.bot.client.base.Result
 import com.linecorp.bot.messaging.client.MessagingApiClient
 import com.linecorp.bot.messaging.model.PushMessageRequest
 import com.linecorp.bot.messaging.model.PushMessageResponse

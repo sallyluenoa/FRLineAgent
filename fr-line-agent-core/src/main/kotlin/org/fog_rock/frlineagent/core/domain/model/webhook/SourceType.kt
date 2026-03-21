@@ -14,41 +14,33 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.sampleapp.domain.model.webhook
+package org.fog_rock.frlineagent.core.domain.model.webhook
 
 import kotlinx.serialization.Serializable
 
 /**
- * Enum class representing the type of a LINE message.
+ * Enum class representing the type of a LINE Webhook event source.
  *
- * @property value The string value of the message type as defined by LINE.
+ * @property value The string value of the source type as defined by LINE.
  */
 @Serializable
-enum class MessageType(val value: String) {
-    /** Text message. */
-    TEXT("text"),
-    /** Image message. */
-    IMAGE("image"),
-    /** Video message. */
-    VIDEO("video"),
-    /** Audio message. */
-    AUDIO("audio"),
-    /** File message. */
-    FILE("file"),
-    /** Location message. */
-    LOCATION("location"),
-    /** Sticker message. */
-    STICKER("sticker"),
-    /** Unknown message type. */
+enum class SourceType(val value: String) {
+    /** User source. */
+    USER("user"),
+    /** Group source. */
+    GROUP("group"),
+    /** Room source. */
+    ROOM("room"),
+    /** Unknown source type. */
     UNKNOWN("unknown");
 
     companion object {
         /**
-         * Converts a string value to a MessageType.
+         * Converts a string value to a SourceType.
          *
          * @param value The string value to convert.
-         * @return The corresponding MessageType.
+         * @return The corresponding SourceType.
          */
-        fun fromString(value: String?): MessageType = entries.find { it.value == value } ?: UNKNOWN
+        fun fromString(value: String?): SourceType = entries.find { it.value == value } ?: UNKNOWN
     }
 }

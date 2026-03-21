@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.sampleapp.domain.service
+package org.fog_rock.frlineagent.core.domain.service
 
 /**
  * Interface for LINE Messaging API client.

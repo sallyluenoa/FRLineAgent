@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.sampleapp.infrastructure.internal.cloud
+package org.fog_rock.frlineagent.core.infrastructure.cloud
 
 import com.linecorp.bot.parser.LineSignatureValidator
 import org.fog_rock.frlineagent.sampleapp.domain.config.AppConfig

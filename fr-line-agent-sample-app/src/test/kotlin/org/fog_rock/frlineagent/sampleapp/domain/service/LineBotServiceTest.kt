@@ -19,6 +19,8 @@ package org.fog_rock.frlineagent.sampleapp.domain.service
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.fog_rock.frlineagent.core.domain.service.LineClient
+import org.fog_rock.frlineagent.core.domain.service.SignatureVerifier
 import org.fog_rock.frlineagent.sampleapp.domain.repository.SheetsRepository
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach

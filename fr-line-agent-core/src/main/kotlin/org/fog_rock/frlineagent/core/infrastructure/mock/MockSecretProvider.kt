@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.sampleapp.domain.service
+package org.fog_rock.frlineagent.core.infrastructure.mock
 
-/**
- * Interface for verifying the signature of a request.
- */
-interface SignatureVerifier {
-    /**
-     * Verifies the signature of the request body.
-     *
-     * @param body The request body.
-     * @param signature The signature to verify.
-     * @return True if the signature is valid, false otherwise.
-     */
-    fun verify(body: String, signature: String): Boolean
+import org.fog_rock.frlineagent.sampleapp.domain.repository.SecretProvider
+
+internal class MockSecretProvider : SecretProvider {
+    private val secrets = mapOf(
+        "LINE_CHANNEL_ACCESS_TOKEN" to "mock_line_channel_access_token",
+        "LINE_CHANNEL_SECRET" to "mock_line_channel_secret",
+        "SPREADSHEET_ID" to "mock_spreadsheet_id",
+        "GOOGLE_CREDENTIALS_JSON" to "{}"
+    )
+
+    override fun getSecret(key: String): String =
+        secrets[key] ?: throw IllegalArgumentException("Secret key `$key` not found in mock.")
 }

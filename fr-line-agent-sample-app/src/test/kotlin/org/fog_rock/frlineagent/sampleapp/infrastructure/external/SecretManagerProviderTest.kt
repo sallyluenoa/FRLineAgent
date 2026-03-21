@@ -18,9 +18,9 @@ package org.fog_rock.frlineagent.sampleapp.infrastructure.external
 
 import io.mockk.*
 import org.fog_rock.frlineagent.sampleapp.domain.config.AppConfig
-import org.fog_rock.frlineagent.sampleapp.domain.config.ProviderMode
-import org.fog_rock.frlineagent.sampleapp.infrastructure.internal.cloud.GoogleSecretProvider
-import org.fog_rock.frlineagent.sampleapp.infrastructure.internal.mock.MockSecretProvider
+import org.fog_rock.frlineagent.core.domain.config.ProviderMode
+import org.fog_rock.frlineagent.core.infrastructure.cloud.GoogleSecretProvider
+import org.fog_rock.frlineagent.core.infrastructure.mock.MockSecretProvider
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

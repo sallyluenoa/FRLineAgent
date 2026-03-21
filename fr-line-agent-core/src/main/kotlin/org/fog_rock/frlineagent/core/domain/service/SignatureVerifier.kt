@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.sampleapp.infrastructure.internal.mock
+package org.fog_rock.frlineagent.core.domain.service
 
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
-
-class LineSignatureMockVerifierTest {
-
-    private val verifier = LineSignatureMockVerifier()
-
-    @Test
-    fun testVerify() {
-        val result = verifier.verify("body", "signature")
-        assertTrue(result)
-    }
+/**
+ * Interface for verifying the signature of a request.
+ */
+interface SignatureVerifier {
+    /**
+     * Verifies the signature of the request body.
+     *
+     * @param body The request body.
+     * @param signature The signature to verify.
+     * @return True if the signature is valid, false otherwise.
+     */
+    fun verify(body: String, signature: String): Boolean
 }

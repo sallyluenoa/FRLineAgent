@@ -17,11 +17,11 @@
 package org.fog_rock.frlineagent.sampleapp.infrastructure.service
 
 import org.fog_rock.frlineagent.sampleapp.domain.config.AppConfig
-import org.fog_rock.frlineagent.sampleapp.domain.config.ProviderMode
-import org.fog_rock.frlineagent.sampleapp.domain.repository.SecretProvider
-import org.fog_rock.frlineagent.sampleapp.domain.service.SignatureVerifier
-import org.fog_rock.frlineagent.sampleapp.infrastructure.internal.cloud.LineSignatureCloudVerifier
-import org.fog_rock.frlineagent.sampleapp.infrastructure.internal.mock.LineSignatureMockVerifier
+import org.fog_rock.frlineagent.core.domain.config.ProviderMode
+import org.fog_rock.frlineagent.core.domain.repository.SecretProvider
+import org.fog_rock.frlineagent.core.domain.service.SignatureVerifier
+import org.fog_rock.frlineagent.core.infrastructure.cloud.LineSignatureCloudVerifier
+import org.fog_rock.frlineagent.core.infrastructure.mock.LineSignatureMockVerifier
 
 class LineSignatureVerifierImpl(
     appConfig: AppConfig,

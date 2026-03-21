@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.sampleapp.infrastructure.internal.mock
+package org.fog_rock.frlineagent.core.infrastructure.mock
 
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-class LineMessagingMockClientTest {
+class LineSignatureMockVerifierTest {
 
-    private val client = LineMessagingMockClient()
-
-    @Test
-    fun testReply() {
-        val result = client.reply("token", "message")
-        assertTrue(result.isSuccess)
-    }
+    private val verifier = LineSignatureMockVerifier()
 
     @Test
-    fun testPush() {
-        val result = client.push("userId", "message")
-        assertTrue(result.isSuccess)
+    fun testVerify() {
+        val result = verifier.verify("body", "signature")
+        assertTrue(result)
     }
 }

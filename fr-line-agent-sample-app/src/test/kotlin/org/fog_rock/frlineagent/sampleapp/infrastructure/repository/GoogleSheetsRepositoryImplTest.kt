@@ -18,8 +18,8 @@ package org.fog_rock.frlineagent.sampleapp.infrastructure.repository
 
 import io.mockk.*
 import org.fog_rock.frlineagent.sampleapp.domain.config.AppConfig
-import org.fog_rock.frlineagent.sampleapp.domain.config.ProviderMode
-import org.fog_rock.frlineagent.sampleapp.domain.repository.SecretProvider
+import org.fog_rock.frlineagent.core.domain.config.ProviderMode
+import org.fog_rock.frlineagent.core.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.sampleapp.infrastructure.internal.cloud.GoogleSheetsCloudRepository
 import org.fog_rock.frlineagent.sampleapp.infrastructure.internal.mock.MockSheetsRepository
 import org.junit.jupiter.api.AfterEach

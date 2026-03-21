@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.sampleapp.domain.repository
+package org.fog_rock.frlineagent.core.infrastructure.mock
 
-/**
- * An interface for providing secret values.
- */
-interface SecretProvider {
-    /**
-     * Get a secret value.
-     * @param key The key of the secret.
-     * @return The secret value.
-     */
-    fun getSecret(key: String): String
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+
+class LineMessagingMockClientTest {
+
+    private val client = LineMessagingMockClient()
+
+    @Test
+    fun testReply() {
+        val result = client.reply("token", "message")
+        assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun testPush() {
+        val result = client.push("userId", "message")
+        assertTrue(result.isSuccess)
+    }
 }

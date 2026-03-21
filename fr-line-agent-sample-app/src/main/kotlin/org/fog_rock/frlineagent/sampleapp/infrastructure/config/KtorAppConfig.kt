@@ -18,7 +18,7 @@ package org.fog_rock.frlineagent.sampleapp.infrastructure.config
 
 import io.ktor.server.config.*
 import org.fog_rock.frlineagent.sampleapp.domain.config.AppConfig
-import org.fog_rock.frlineagent.sampleapp.domain.config.ProviderMode
+import org.fog_rock.frlineagent.core.domain.config.ProviderMode
 
 /**
  * A class that reads AppConfig from a Ktor configuration file.

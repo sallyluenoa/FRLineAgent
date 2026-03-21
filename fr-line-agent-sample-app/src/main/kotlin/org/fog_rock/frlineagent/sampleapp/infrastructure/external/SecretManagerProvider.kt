@@ -17,10 +17,10 @@
 package org.fog_rock.frlineagent.sampleapp.infrastructure.external
 
 import org.fog_rock.frlineagent.sampleapp.domain.config.AppConfig
-import org.fog_rock.frlineagent.sampleapp.domain.config.ProviderMode
-import org.fog_rock.frlineagent.sampleapp.domain.repository.SecretProvider
-import org.fog_rock.frlineagent.sampleapp.infrastructure.internal.cloud.GoogleSecretProvider
-import org.fog_rock.frlineagent.sampleapp.infrastructure.internal.mock.MockSecretProvider
+import org.fog_rock.frlineagent.core.domain.config.ProviderMode
+import org.fog_rock.frlineagent.core.domain.repository.SecretProvider
+import org.fog_rock.frlineagent.core.infrastructure.cloud.GoogleSecretProvider
+import org.fog_rock.frlineagent.core.infrastructure.mock.MockSecretProvider
 
 class SecretManagerProvider(appConfig: AppConfig) : SecretProvider {
 

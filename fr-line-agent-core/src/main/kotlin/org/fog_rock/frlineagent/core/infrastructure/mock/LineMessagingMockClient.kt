@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.sampleapp.infrastructure.internal.mock
+package org.fog_rock.frlineagent.core.infrastructure.mock
 
-import org.fog_rock.frlineagent.sampleapp.domain.service.SignatureVerifier
+import org.fog_rock.frlineagent.sampleapp.domain.service.LineClient
 import org.slf4j.LoggerFactory
 
-internal class LineSignatureMockVerifier : SignatureVerifier {
+internal class LineMessagingMockClient : LineClient {
 
-    private val logger = LoggerFactory.getLogger(LineSignatureMockVerifier::class.java)
+    private val logger = LoggerFactory.getLogger(LineMessagingMockClient::class.java)
 
-    override fun verify(body: String, signature: String): Boolean {
-        logger.info("Mock verify signature. body: $body, signature: $signature")
-        return true
+    override fun reply(token: String, message: String): Result<Unit> {
+        logger.info("Mock reply message sent. token: $token, message: $message")
+        return Result.success(Unit)
+    }
+
+    override fun push(to: String, message: String): Result<Unit> {
+        logger.info("Mock push message sent. to: $to, message: $message")
+        return Result.success(Unit)
     }
 }

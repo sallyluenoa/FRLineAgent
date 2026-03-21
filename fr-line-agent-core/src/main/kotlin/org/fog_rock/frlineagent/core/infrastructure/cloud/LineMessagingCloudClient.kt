@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.sampleapp.infrastructure.internal.cloud
+package org.fog_rock.frlineagent.core.infrastructure.cloud
 
-import com.linecorp.bot.client.base.Result
 import com.linecorp.bot.messaging.client.MessagingApiClient
 import com.linecorp.bot.messaging.model.PushMessageRequest
 import com.linecorp.bot.messaging.model.ReplyMessageRequest
@@ -39,26 +38,26 @@ internal class LineMessagingCloudClient(
         MessagingApiClient.builder(channelAccessToken).build()
     }
 
-    override fun reply(token: String, message: String): kotlin.Result<Unit> =
+    override fun reply(token: String, message: String): Result<Unit> =
         try {
             val replyMessageRequest = ReplyMessageRequest.Builder(token, listOf(TextMessage(message))).build()
             val response: Result<*> = client.replyMessage(replyMessageRequest).get()
             logger.info("Reply message response: $response")
-            kotlin.Result.success(Unit)
+            Result.success(Unit)
         } catch (e: Exception) {
             logger.error("Failed to reply message", e)
-            kotlin.Result.failure(e)
+            Result.failure(e)
         }
 
-    override fun push(to: String, message: String): kotlin.Result<Unit> =
+    override fun push(to: String, message: String): Result<Unit> =
         try {
             val pushMessageRequest = PushMessageRequest.Builder(to, listOf(TextMessage(message))).build()
             val response: Result<*> = client.pushMessage(UUID.randomUUID(), pushMessageRequest).get()
 
             logger.info("Push message response: $response")
-            kotlin.Result.success(Unit)
+            Result.success(Unit)
         } catch (e: Exception) {
             logger.error("Failed to push message", e)
-            kotlin.Result.failure(e)
+            Result.failure(e)
         }
 }

@@ -19,11 +19,11 @@ package org.fog_rock.frlineagent.sampleapp.plugins
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import org.fog_rock.frlineagent.sampleapp.domain.config.AppConfig
-import org.fog_rock.frlineagent.sampleapp.domain.repository.SecretProvider
+import org.fog_rock.frlineagent.core.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.sampleapp.domain.repository.SheetsRepository
 import org.fog_rock.frlineagent.sampleapp.domain.service.LineBotService
-import org.fog_rock.frlineagent.sampleapp.domain.service.LineClient
-import org.fog_rock.frlineagent.sampleapp.domain.service.SignatureVerifier
+import org.fog_rock.frlineagent.core.domain.service.LineClient
+import org.fog_rock.frlineagent.core.domain.service.SignatureVerifier
 import org.fog_rock.frlineagent.sampleapp.infrastructure.config.KtorAppConfig
 import org.fog_rock.frlineagent.sampleapp.infrastructure.external.SecretManagerProvider
 import org.fog_rock.frlineagent.sampleapp.infrastructure.repository.GoogleSheetsRepositoryImpl

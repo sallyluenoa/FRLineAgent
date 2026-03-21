@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.sampleapp.infrastructure.internal.cloud
+package org.fog_rock.frlineagent.core.infrastructure.cloud
 
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient
 import com.google.cloud.secretmanager.v1.SecretVersionName
 import org.fog_rock.frlineagent.sampleapp.domain.repository.SecretProvider
+import kotlin.use
 
 internal class GoogleSecretProvider(private val projectNumber: String) : SecretProvider {
     override fun getSecret(key: String): String {

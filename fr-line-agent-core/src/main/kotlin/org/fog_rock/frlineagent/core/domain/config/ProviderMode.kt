@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.sampleapp.domain.config
+package org.fog_rock.frlineagent.core.domain.config
 
 /**
  * Provider mode.
