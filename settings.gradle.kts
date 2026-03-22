@@ -16,6 +16,9 @@
 
 rootProject.name = "FRLineAgent"
 
+include(":fr-line-agent-core")
+include(":fr-line-agent-sample-app")
+
 @Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     repositories {
