@@ -137,9 +137,10 @@ class LineBotService(
             return
         }
         // Compose Success Message
-        val sourceId = when (event.source?.sourceType) {
-            SourceType.USER -> "UserId: ${event.source.userId}"
-            SourceType.GROUP -> "GroupId: ${event.source.groupId}"
+        val source = event.source
+        val sourceId = when (source?.sourceType) {
+            SourceType.USER -> "UserId: ${source.userId}"
+            SourceType.GROUP -> "GroupId: ${source.groupId}"
             else -> "SourceId: unknown"
         }
         val message = "Reply message: ${sheetData[0][0]} ($sourceId)"
@@ -153,14 +154,16 @@ class LineBotService(
             logger.info("The event type is not message. eventType: ${event.eventType}")
             return false
         }
-        if (event.message?.messageType != MessageType.TEXT) {
-            logger.info("The message type is not text. messageType: ${event.message?.messageType}")
+        val message = event.message
+        if (message?.messageType != MessageType.TEXT) {
+            logger.info("The message type is not text. messageType: ${message?.messageType}")
             return false
         }
-        logger.info("sourceType: ${event.source?.sourceType}")
-        return when (event.source?.sourceType) {
+        val source = event.source
+        logger.info("sourceType: ${source?.sourceType}")
+        return when (source?.sourceType) {
             SourceType.USER -> true
-            SourceType.GROUP -> event.message.mention?.mentionees?.any { it.userId == botId } ?: false
+            SourceType.GROUP -> message.mention?.mentionees?.any { it.userId == botId } ?: false
             else -> false
         }
     }
