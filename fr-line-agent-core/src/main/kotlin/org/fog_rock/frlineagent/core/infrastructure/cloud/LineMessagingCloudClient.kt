@@ -41,7 +41,7 @@ class LineMessagingCloudClient(
     override fun reply(token: String, message: String): Result<Unit> =
         try {
             val replyMessageRequest = ReplyMessageRequest.Builder(token, listOf(TextMessage(message))).build()
-            val response: Result<*> = client.replyMessage(replyMessageRequest).get()
+            val response = client.replyMessage(replyMessageRequest).get()
             logger.info("Reply message response: $response")
             Result.success(Unit)
         } catch (e: Exception) {
@@ -52,7 +52,7 @@ class LineMessagingCloudClient(
     override fun push(to: String, message: String): Result<Unit> =
         try {
             val pushMessageRequest = PushMessageRequest.Builder(to, listOf(TextMessage(message))).build()
-            val response: Result<*> = client.pushMessage(UUID.randomUUID(), pushMessageRequest).get()
+            val response = client.pushMessage(UUID.randomUUID(), pushMessageRequest).get()
 
             logger.info("Push message response: $response")
             Result.success(Unit)

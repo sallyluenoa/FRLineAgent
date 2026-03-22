@@ -21,6 +21,7 @@ import com.linecorp.bot.messaging.model.PushMessageRequest
 import com.linecorp.bot.messaging.model.PushMessageResponse
 import com.linecorp.bot.messaging.model.ReplyMessageRequest
 import com.linecorp.bot.messaging.model.ReplyMessageResponse
+import com.linecorp.bot.client.base.Result as LineResult
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -68,7 +69,7 @@ class LineMessagingCloudClientTest {
     fun testReply_success() {
         val token = "reply-token"
         val message = "Hello"
-        val result = mockk<Result<ReplyMessageResponse>>()
+        val result = mockk<LineResult<ReplyMessageResponse>>()
         val future = CompletableFuture.completedFuture(result)
 
         every { messagingApiClient.replyMessage(any<ReplyMessageRequest>()) } returns future
@@ -83,7 +84,7 @@ class LineMessagingCloudClientTest {
     fun testReply_failure() {
         val token = "reply-token"
         val message = "Hello"
-        val future = CompletableFuture<Result<ReplyMessageResponse>>()
+        val future = CompletableFuture<LineResult<ReplyMessageResponse>>()
         future.completeExceptionally(RuntimeException("API Error"))
 
         every { messagingApiClient.replyMessage(any<ReplyMessageRequest>()) } returns future
@@ -97,7 +98,7 @@ class LineMessagingCloudClientTest {
     fun testPush_success() {
         val userId = "user-id"
         val message = "Hello"
-        val result = mockk<Result<PushMessageResponse>>()
+        val result = mockk<LineResult<PushMessageResponse>>()
         val future = CompletableFuture.completedFuture(result)
 
         every { messagingApiClient.pushMessage(any<UUID>(), any<PushMessageRequest>()) } returns future
@@ -112,7 +113,7 @@ class LineMessagingCloudClientTest {
     fun testPush_failure() {
         val userId = "user-id"
         val message = "Hello"
-        val future = CompletableFuture<Result<PushMessageResponse>>()
+        val future = CompletableFuture<LineResult<PushMessageResponse>>()
         future.completeExceptionally(RuntimeException("API Error"))
 
         every { messagingApiClient.pushMessage(any<UUID>(), any<PushMessageRequest>()) } returns future
