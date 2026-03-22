@@ -90,22 +90,22 @@ package "fr-line-agent-core" {
 
 ' --- Relationships ---
 
-' App Presentation -> App Domain
+' App Presentation uses App Domain
 WebhookRoute --> LineBotService
 PushTriggerRoute --> LineBotService
 
-' App Domain -> Core Domain Interfaces & App Domain Interfaces
+' App Domain uses Core/App Domain interfaces
 LineBotService --> LineClient
 LineBotService --> SignatureVerifier
 LineBotService --> SheetsRepository
 
-' App Infra -> App Domain & Core Domain (implements interfaces)
+' App Infra implements Core/App Domain interfaces
 GoogleSheetsRepositoryImpl .up.|> SheetsRepository
 LineMessagingClientImpl .up.|> LineClient
 LineSignatureVerifierImpl .up.|> SignatureVerifier
 SecretManagerProvider .up.|> SecretProvider
 
-' Core Infra -> Core Domain (implements interfaces)
+' Core Infra implements Core Domain interfaces
 LineMessagingCloudClient .up.|> LineClient
 LineSignatureCloudVerifier .up.|> SignatureVerifier
 GoogleSecretProvider .up.|> SecretProvider
@@ -113,10 +113,10 @@ LineMessagingMockClient .up.|> LineClient
 LineSignatureMockVerifier .up.|> SignatureVerifier
 MockSecretProvider .up.|> SecretProvider
 
-' App Infra -> App Infra (internal dependency)
+' App Infra internal dependencies
 GoogleSheetsRepositoryImpl --> SecretManagerProvider
 
-' App Infra -> Core Infra (Bridge/Factory pattern)
+' App Infra bridges to Core Infra implementations
 LineMessagingClientImpl ..> LineMessagingCloudClient
 LineMessagingClientImpl ..> LineMessagingMockClient
 LineSignatureVerifierImpl ..> LineSignatureCloudVerifier
@@ -124,9 +124,8 @@ LineSignatureVerifierImpl ..> LineSignatureMockVerifier
 SecretManagerProvider ..> GoogleSecretProvider
 SecretManagerProvider ..> MockSecretProvider
 
-' Core Infra -> Core Domain (internal dependency)
+' Core Infra uses Core Domain interfaces
 LineMessagingCloudClient --> SecretProvider
 LineSignatureCloudVerifier --> SecretProvider
-
 
 @enduml
