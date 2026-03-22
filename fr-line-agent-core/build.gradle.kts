@@ -17,7 +17,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.ktor)
 }
 
 kotlin {
@@ -25,15 +24,10 @@ kotlin {
 }
 
 dependencies {
-    implementation(libs.bundles.ktor.server)
-    implementation(libs.bundles.koin)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.logback.classic)
     implementation(libs.google.cloud.secretmanager)
-    implementation(libs.google.api.client)
-    implementation(libs.google.oauth.client.jetty)
-    implementation(libs.google.sheets.api)
     implementation(libs.bundles.line.bot)
-    testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.mockk)
