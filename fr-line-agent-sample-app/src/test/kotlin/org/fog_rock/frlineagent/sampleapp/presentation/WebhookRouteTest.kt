@@ -21,7 +21,6 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing

@@ -53,5 +53,5 @@ class KtorAppConfig(config: ApplicationConfig) : AppConfig {
         config.property("app.line_bot.channel_secret_key").getString()
 
     private fun getProviderMode(config: ApplicationConfig, path: String): ProviderMode =
-        ProviderMode.Companion.convert(config.propertyOrNull(path)?.getString())
+        ProviderMode.convert(config.propertyOrNull(path)?.getString())
 }
