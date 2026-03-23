@@ -37,7 +37,7 @@ services:
 
     # Mount local resources to the container to access configuration files.
     volumes:
-      - ./src/main/resources:/app/resources
+      - ./fr-line-agent-sample-app/src/main/resources:/app/resources
       - ~/.config/gcloud/application_default_credentials.json:/app/gcp-credentials.json:ro
 
     # Use mapping style for environment variables.

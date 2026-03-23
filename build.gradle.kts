@@ -15,43 +15,12 @@
  */
 
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.ktor)
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.ktor) apply false
 }
 
-group = "org.fog_rock"
-version = "0.0.1"
-
-kotlin {
-    jvmToolchain(21)
-}
-
-application {
-    mainClass = "io.ktor.server.netty.EngineMain"
-}
-
-dependencies {
-    implementation(libs.bundles.ktor.server)
-    implementation(libs.bundles.koin)
-    implementation(libs.logback.classic)
-    implementation(libs.google.cloud.secretmanager)
-    implementation(libs.google.api.client)
-    implementation(libs.google.oauth.client.jetty)
-    implementation(libs.google.sheets.api)
-    implementation(libs.bundles.line.bot)
-    testImplementation(libs.ktor.server.test.host)
-    testImplementation(libs.kotlin.test.junit)
-    testImplementation(libs.junit.jupiter.api)
-    testImplementation(libs.mockk)
-    testRuntimeOnly(libs.junit.jupiter.engine)
-    testRuntimeOnly(libs.junit.platform.launcher)
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-tasks.getByName<Jar>("shadowJar") {
-    archiveFileName.set("${project.name}-${project.version}-all.jar")
+allprojects {
+    group = "org.fog_rock"
+    version = "0.0.1"
 }

@@ -20,10 +20,11 @@ FROM amazoncorretto:21 AS build
 WORKDIR /app
 
 # Copy the Gradle executable and configuration files
-COPY gradlew .
-COPY gradle gradle
-COPY build.gradle.kts .
-COPY settings.gradle.kts .
+COPY gradlew gradlew.bat ./
+COPY gradle ./gradle
+COPY build.gradle.kts settings.gradle.kts gradle.properties ./
+COPY fr-line-agent-core/build.gradle.kts ./fr-line-agent-core/
+COPY fr-line-agent-sample-app/build.gradle.kts ./fr-line-agent-sample-app/
 
 # Grant execution permission to the gradlew script
 RUN chmod +x gradlew
@@ -32,10 +33,11 @@ RUN chmod +x gradlew
 RUN ./gradlew --no-daemon dependencies
 
 # Copy the source code
-COPY src src
+COPY fr-line-agent-core/src ./fr-line-agent-core/src
+COPY fr-line-agent-sample-app/src ./fr-line-agent-sample-app/src
 
 # Build the application FAT JAR, skipping tests for faster CI/CD
-RUN ./gradlew --no-daemon build -x test
+RUN ./gradlew --no-daemon :fr-line-agent-sample-app:build -x test
 
 # Stage 2: Runtime stage
 # Using a lightweight Alpine-based JRE for the final image
@@ -48,11 +50,11 @@ ENV PROJECT_NUMBER=${PROJECT_NUMBER}
 
 # Copy only the built JAR file from the build stage
 # Note: Ensure the JAR filename pattern matches your build/libs output
-COPY --from=build /app/build/libs/FRLineAgent-*-all.jar /app/app.jar
+COPY --from=build /app/fr-line-agent-sample-app/build/libs/fr-line-agent-sample-app-*-all.jar /app/app.jar
 
 # Cloud Run injects the PORT environment variable at runtime
 # We default to 8080 but the app should listen on $PORT
-ENV PORT 8080
+ENV PORT=8080
 EXPOSE 8080
 
 # Run the application with optimized memory settings for container environments

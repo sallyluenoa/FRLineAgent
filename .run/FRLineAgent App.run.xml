@@ -4,15 +4,15 @@
       <env name="PROJECT_NUMBER" value="111111111111" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="io.ktor.server.netty.EngineMain" />
-    <module name="FRLineAgent.main" />
-    <option name="PROGRAM_PARAMETERS" value="-config=src/main/resources/application.yaml -config=src/main/resources/application-local.yaml" />
+    <module name="FRLineAgent.fr-line-agent-sample-app.main" />
+    <option name="PROGRAM_PARAMETERS" value="-config=fr-line-agent-sample-app/src/main/resources/application.yaml -config=fr-line-agent-sample-app/src/main/resources/application-local.yaml" />
     <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
     <option name="alternativeJrePath" />
     <option name="alternativeJrePathEnabled" value="false" />
     <option name="includeProvidedScope" value="false" />
     <option name="mainClass" value="io.ktor.server.netty.EngineMain" />
     <option name="passParentEnvs" value="true" />
-    <option name="programParameters" value="-config=src/main/resources/application.yaml -config=src/main/resources/application-local.yaml" />
+    <option name="programParameters" value="-config=fr-line-agent-sample-app/src/main/resources/application.yaml -config=fr-line-agent-sample-app/src/main/resources/application-local.yaml" />
     <option name="shortenCommandLine" />
     <option name="vmParameters" />
     <option name="workingDirectory" value="$ProjectFileDir$" />

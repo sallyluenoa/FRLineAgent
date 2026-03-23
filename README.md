@@ -24,13 +24,13 @@ This project is built using the following technologies:
 To run the server locally with development-specific configurations (e.g., `application-local.yaml`), execute the following command. This command passes the necessary configuration files to the Ktor application.
 
 ```bash
-./gradlew run --args='-config=src/main/resources/application.yaml -config=src/main/resources/application-local.yaml'
+./gradlew :fr-line-agent-sample-app:run --args='-config=fr-line-agent-sample-app/src/main/resources/application.yaml -config=fr-line-agent-sample-app/src/main/resources/application-local.yaml'
 ```
 
 The server will start and listen on `http://localhost:8080` by default.
 
 ### Running with Docker (Local)
-To verify the Docker image and run the application in a containerized environment locally, use Docker Compose. This setup mounts the local `src/main/resources` directory, allowing the container to use `application-local.yaml`.
+To verify the Docker image and run the application in a containerized environment locally, use Docker Compose. This setup mounts the local `fr-line-agent-sample-app/src/main/resources` directory, allowing the container to use `application-local.yaml`.
 
 ```bash
 # Build the image and start the container with the environment variables
@@ -71,7 +71,7 @@ This endpoint simulates a webhook event from the LINE Platform. It requires a JS
 curl -v -X POST http://localhost:8080/webhook \
   -H "Content-Type: application/json" \
   -H "X-Line-Signature: dummy_signature" \
-  -d @src/test/resources/request/webhook/user_message.json
+  -d @fr-line-agent-sample-app/src/test/resources/request/webhook/user_message.json
 ```
 
 - **`X-Line-Signature`**: The signature verification is enabled on the server. Using a `dummy_signature` as shown will correctly result in an HTTP `401 Unauthorized` response, which confirms that the signature validation logic is working as expected.
@@ -94,27 +94,33 @@ To build the project, run:
 To build a fat JAR (executable JAR with all dependencies):
 
 ```bash
-./gradlew buildFatJar
+./gradlew :fr-line-agent-sample-app:shadowJar
 ```
 
 ## Project Structure
 
 ```
 FRLineAgent/
-├── src/
-│   ├── main/
-│   │   ├── kotlin/org/fog_rock/frlineagent/
-│   │   │   ├── presentation/   # Handles external HTTP requests and validation (Routing)
-│   │   │   ├── domain/         # Business logic and abstractions (Service, Interfaces, Models)
-│   │   │   ├── infrastructure/ # Concrete implementations of external APIs/SDKs (Google, LINE, GCP)
-│   │   │   ├── plugins/        # Ktor framework configurations (DI, Serialization, Error Handling)
-│   │   │   └── Application.kt  # Application entry point
-│   │   └── resources/          # Configuration files and logging settings
-│   └── test/                   # Unit and integration tests
-├── gradle/                     # Gradle wrapper and version catalogs
-├── docs/                       # UML diagrams and documentations
-├── build.gradle.kts            # Build configuration
-└── settings.gradle.kts         # Project settings
+├── fr-line-agent-core/
+│   └── src/main/kotlin/org/fog_rock/frlineagent/core/
+│       ├── domain/             # Core business logic, models, and service interfaces
+│       └── infrastructure/     # Implementations of interfaces using external libraries (e.g., LINE SDK, GCP SDK)
+├── fr-line-agent-sample-app/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── kotlin/org/fog_rock/frlineagent/sampleapp/
+│   │   │   │   ├── presentation/   # Ktor routing, request/response handling
+│   │   │   │   ├── domain/         # Application-specific business logic and services
+│   │   │   │   ├── infrastructure/ # Implementation of interfaces for the sample app
+│   │   │   │   ├── plugins/        # Ktor plugin configurations (DI, Serialization)
+│   │   │   │   └── Application.kt  # Main entry point for the Ktor application
+│   │   │   └── resources/          # Configuration files (application.yaml, logback.xml)
+│   │   └── test/                   # Unit and integration tests
+│   └── build.gradle.kts
+├── gradle/                         # Gradle wrapper files
+├── docs/                           # Documentation and diagrams
+├── build.gradle.kts                # Root build configuration
+└── settings.gradle.kts             # Gradle project and module settings
 ```
 
 ### Layer Responsibilities

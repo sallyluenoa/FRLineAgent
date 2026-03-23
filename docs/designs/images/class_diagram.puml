@@ -5,90 +5,127 @@ skinparam linetype ortho
 skinparam packageStyle rectangle
 top to bottom direction
 
-' --- Presentation Layer ---
-package "1. Presentation Layer" as Presentation #FEFEFE {
-    class WebhookRoute {
-        - service: LineBotService
-        + handle(call: ApplicationCall): Unit
+' By placing the packages side-by-side, we can make the dependencies flow more clearly from left to right.
+package "fr-line-agent-sample-app" {
+    package "Presentation" {
+        class WebhookRoute {
+            + handle(call: ApplicationCall): Unit
+        }
+        class PushTriggerRoute {
+            + handle(call: ApplicationCall): Unit
+        }
     }
-    class PushTriggerRoute {
-        - service: LineBotService
-        + handle(call: ApplicationCall): Unit
+
+    package "Domain" {
+        class LineBotService {
+            + handleWebhook(body: String, signature: String): Result<Unit>
+            + executeScheduledPush(): Result<Unit>
+        }
+        interface SheetsRepository <<interface>> {
+            + fetchSheetData(range: String): List<List<Any>>
+        }
+    }
+
+    package "Infrastructure" {
+        class GoogleSheetsRepositoryImpl {
+            + fetchSheetData(range: String): List<List<Any>>
+        }
+        class LineMessagingClientImpl {
+            + reply(token: String, message: String): Result<Unit>
+            + push(to: String, message: String): Result<Unit>
+        }
+        class LineSignatureVerifierImpl {
+            + verify(body: String, signature: String): Boolean
+        }
+        class SecretManagerProvider {
+            + getSecret(key: String): String
+        }
     }
 }
 
-' --- Service Layer ---
-package "2. Service Layer" as Service #F5F5F5 {
-    class LineBotService {
-        - sheetsRepo: SheetsRepository
-        - lineClient: LineClient
-        - verifier: SignatureVerifier
-        + handleWebhook(body: String, signature: String): Result<Unit>
-        + executeScheduledPush(): Result<Unit>
+' Use hidden link to position the core package to the right of the app package.
+"fr-line-agent-sample-app" -[hidden]right- "fr-line-agent-core"
+
+package "fr-line-agent-core" {
+    package "Domain" #LightGray {
+        interface LineClient <<interface>> {
+            + reply(token: String, message: String): Result<Unit>
+            + push(to: String, message: String): Result<Unit>
+        }
+        interface SignatureVerifier <<interface>> {
+            + verify(body: String, signature: String): Boolean
+        }
+        interface SecretProvider <<interface>> {
+            + getSecret(key: String): String
+        }
     }
 
-    interface SignatureVerifier <<interface>> {
-        + verify(body: String, signature: String): Boolean
-    }
-
-    interface SheetsRepository <<interface>> {
-        + fetchSheetData(range: String): List<List<Any>>
-    }
-
-    interface LineClient <<interface>> {
-        + reply(token: String, message: String): Result<Unit>
-        + push(to: String, message: String): Result<Unit>
-    }
-
-    class NotificationContent <<data>> {
-        + to: String
-        + message: String
-    }
-}
-
-' --- Infrastructure Layer ---
-package "3. Infrastructure Layer" as Infra #EEEEEE {
-    class LineSignatureVerifierImpl {
-        - channelSecret: String
-        + verify(body: String, signature: String): Boolean
-    }
-    class GoogleSheetsRepositoryImpl {
-        - spreadsheetId: String
-        - credentialsJson: String
-        + fetchSheetData(range: String): List<List<Any>>
-    }
-    class LineMessagingClientImpl {
-        - accessToken: String
-        + reply(token: String, message: String): Result<Unit>
-        + push(to: String, message: String): Result<Unit>
-    }
-    class SecretManagerProvider {
-        + getSecret(key: String): String
+    package "Infrastructure" #LightGray {
+        package "Cloud" {
+            class LineMessagingCloudClient {
+                + reply(token: String, message: String): Result<Unit>
+                + push(to: String, message: String): Result<Unit>
+            }
+            class LineSignatureCloudVerifier {
+                + verify(body: String, signature: String): Boolean
+            }
+            class GoogleSecretProvider {
+                + getSecret(key: String): String
+            }
+        }
+        package "Mock" {
+            class LineMessagingMockClient {
+                + reply(token: String, message: String): Result<Unit>
+                + push(to: String, message: String): Result<Unit>
+            }
+            class LineSignatureMockVerifier {
+                + verify(body: String, signature: String): Boolean
+            }
+            class MockSecretProvider {
+                + getSecret(key: String): String
+            }
+        }
     }
 }
 
-' --- Layout Constraints (Hidden Links) ---
-Presentation -[hidden]down-> Service
-Service -[hidden]down-> Infra
+' --- Relationships ---
 
-' --- Real Relationships ---
-' Presentation -> Service
-WebhookRoute -down-> LineBotService
-PushTriggerRoute -down-> LineBotService
+' App Presentation uses App Domain
+WebhookRoute --> LineBotService
+PushTriggerRoute --> LineBotService
 
-' Service Logic Dependencies
-LineBotService -right-> SignatureVerifier
-LineBotService -right-> SheetsRepository
-LineBotService -right-> LineClient
-LineBotService .right.> NotificationContent
+' App Domain uses Core/App Domain interfaces
+LineBotService --> LineClient
+LineBotService --> SignatureVerifier
+LineBotService --> SheetsRepository
 
-' Dependency Inversion: Infra implements Service Interfaces
-LineSignatureVerifierImpl .up.|> SignatureVerifier
+' App Infra implements Core/App Domain interfaces
 GoogleSheetsRepositoryImpl .up.|> SheetsRepository
 LineMessagingClientImpl .up.|> LineClient
+LineSignatureVerifierImpl .up.|> SignatureVerifier
+SecretManagerProvider .up.|> SecretProvider
 
-' Internal Infra usage
-LineMessagingClientImpl .right.> SecretManagerProvider
-LineSignatureVerifierImpl .right.> SecretManagerProvider
+' Core Infra implements Core Domain interfaces
+LineMessagingCloudClient .up.|> LineClient
+LineSignatureCloudVerifier .up.|> SignatureVerifier
+GoogleSecretProvider .up.|> SecretProvider
+LineMessagingMockClient .up.|> LineClient
+LineSignatureMockVerifier .up.|> SignatureVerifier
+MockSecretProvider .up.|> SecretProvider
+
+' App Infra internal dependencies
+GoogleSheetsRepositoryImpl --> SecretManagerProvider
+
+' App Infra bridges to Core Infra implementations
+LineMessagingClientImpl ..> LineMessagingCloudClient
+LineMessagingClientImpl ..> LineMessagingMockClient
+LineSignatureVerifierImpl ..> LineSignatureCloudVerifier
+LineSignatureVerifierImpl ..> LineSignatureMockVerifier
+SecretManagerProvider ..> GoogleSecretProvider
+SecretManagerProvider ..> MockSecretProvider
+
+' Core Infra uses Core Domain interfaces
+LineMessagingCloudClient --> SecretProvider
+LineSignatureCloudVerifier --> SecretProvider
 
 @enduml
