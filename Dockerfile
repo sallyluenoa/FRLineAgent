@@ -54,7 +54,7 @@ COPY --from=build /app/fr-line-agent-sample-app/build/libs/fr-line-agent-sample-
 
 # Cloud Run injects the PORT environment variable at runtime
 # We default to 8080 but the app should listen on $PORT
-ENV PORT 8080
+ENV PORT=8080
 EXPOSE 8080
 
 # Run the application with optimized memory settings for container environments
