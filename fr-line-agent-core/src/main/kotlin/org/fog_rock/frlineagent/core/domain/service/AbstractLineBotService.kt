@@ -37,36 +37,6 @@ abstract class AbstractLineBotService(
     private val json = Json { ignoreUnknownKeys = true }
 
     /**
-     * Verifies the webhook signature.
-     * This method can be overridden in subclasses for custom verification logic, e.g., for debugging.
-     *
-     * @param body The request body.
-     * @param signature The signature from the X-Line-Signature header.
-     * @return True if the signature is valid, false otherwise.
-     */
-    protected open fun verifySignature(body: String, signature: String): Boolean =
-        verifier.verify(body, signature)
-
-    /**
-     * Processes a single webhook event.
-     * It retrieves a reply message from `createReplyMessage` and sends it if available.
-     *
-     * @param event The webhook event to process.
-     * @param botId The destination bot ID.
-     */
-    private fun processEvent(event: LineWebhookEvent.Event, botId: String) {
-        val replyToken = event.replyToken ?: return // No token, no reply.
-
-        // Call the abstract method to get the message from the subclass
-        val message = createReplyMessage(event, botId)
-
-        // If the subclass provided a message, send the reply.
-        if (!message.isNullOrBlank()) {
-            reply(replyToken, message)
-        }
-    }
-
-    /**
      * Handles the webhook request from LINE Platform.
      * Verifies the signature, parses the event, and delegates to handleEvent.
      *
@@ -96,46 +66,6 @@ abstract class AbstractLineBotService(
     }
 
     /**
-     * Creates a reply message for a given webhook event.
-     * Subclasses must implement this method to define the bot's reply logic.
-     * If null is returned, no reply message will be sent.
-     *
-     * @param event The webhook event.
-     * @param botId The destination bot ID.
-     * @return A reply message string, or null if no reply should be sent.
-     */
-    protected abstract fun createReplyMessage(event: LineWebhookEvent.Event, botId: String): String?
-
-    private fun push(to: String, message: String): Result<Unit> =
-        lineClient.push(to, message)
-
-    private fun pushAll(notifications: List<Notification>): Int {
-        var failureCount = 0
-        notifications.forEach { notification ->
-            push(notification.to, notification.message)
-                .onSuccess {
-                    logger.info("Successfully pushed message to ${notification.to}")
-                }
-                .onFailure { e ->
-                    logger.error("Failed to push message to ${notification.to}", e)
-                    failureCount++
-                }
-        }
-        return failureCount
-    }
-
-    private fun reply(replyToken: String, message: String): Result<Unit> =
-        lineClient.reply(replyToken, message)
-
-    /**
-     * Creates a list of push notifications.
-     * Subclasses must implement this method to define the bot's push notification logic.
-     *
-     * @return A list of notifications to be sent.
-     */
-    protected abstract fun createPushNotifications(): List<Notification>
-
-    /**
      * Executes the push notification process.
      * It retrieves notifications from `createPushNotifications` and sends them.
      *
@@ -161,4 +91,74 @@ abstract class AbstractLineBotService(
             Result.success(Unit)
         }
     }
+
+    /**
+     * Verifies the webhook signature.
+     * This method can be overridden in subclasses for custom verification logic, e.g., for debugging.
+     *
+     * @param body The request body.
+     * @param signature The signature from the X-Line-Signature header.
+     * @return True if the signature is valid, false otherwise.
+     */
+    protected open fun verifySignature(body: String, signature: String): Boolean =
+        verifier.verify(body, signature)
+
+    /**
+     * Creates a reply message for a given webhook event.
+     * Subclasses must implement this method to define the bot's reply logic.
+     * If null is returned, no reply message will be sent.
+     *
+     * @param event The webhook event.
+     * @param botId The destination bot ID.
+     * @return A reply message string, or null if no reply should be sent.
+     */
+    protected abstract fun createReplyMessage(event: LineWebhookEvent.Event, botId: String): String?
+
+    /**
+     * Creates a list of push notifications.
+     * Subclasses must implement this method to define the bot's push notification logic.
+     *
+     * @return A list of notifications to be sent.
+     */
+    protected abstract fun createPushNotifications(): List<Notification>
+
+    /**
+     * Processes a single webhook event.
+     * It retrieves a reply message from `createReplyMessage` and sends it if available.
+     *
+     * @param event The webhook event to process.
+     * @param botId The destination bot ID.
+     */
+    private fun processEvent(event: LineWebhookEvent.Event, botId: String) {
+        val replyToken = event.replyToken ?: return // No token, no reply.
+
+        // Call the abstract method to get the message from the subclass
+        val message = createReplyMessage(event, botId)
+
+        // If the subclass provided a message, send the reply.
+        if (!message.isNullOrBlank()) {
+            reply(replyToken, message)
+        }
+    }
+
+    private fun reply(replyToken: String, message: String): Result<Unit> =
+        lineClient.reply(replyToken, message)
+
+    private fun pushAll(notifications: List<Notification>): Int {
+        var failureCount = 0
+        notifications.forEach { notification ->
+            push(notification.to, notification.message)
+                .onSuccess {
+                    logger.info("Successfully pushed message to ${notification.to}")
+                }
+                .onFailure { e ->
+                    logger.error("Failed to push message to ${notification.to}", e)
+                    failureCount++
+                }
+        }
+        return failureCount
+    }
+
+    private fun push(to: String, message: String): Result<Unit> =
+        lineClient.push(to, message)
 }

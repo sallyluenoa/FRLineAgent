@@ -38,31 +38,10 @@ class LineBotService(
     private val logger = LoggerFactory.getLogger(LineBotService::class.java)
 
     companion object {
-        // Default range for scheduled push notifications (To, Message)
-        private const val SHEET_RANGE_PUSH = "Sheet1!A:B"
         // Default range for webhook data retrieval
-        private const val SHEET_RANGE_WEBHOOK = "Sheet1!C:D"
-    }
-
-    override fun createPushNotifications(): List<Notification> {
-        // Fetch sheet data
-        val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_PUSH)
-        if (sheetData.isEmpty()) {
-            logger.info("No data found for scheduled push.")
-            return emptyList()
-        }
-
-        // Parse & Extract Notification Data
-        return sheetData.mapNotNull { row ->
-            if (row.size >= 2) {
-                Notification(
-                    to = row[0].toString(),
-                    message = row[1].toString()
-                )
-            } else {
-                null
-            }
-        }
+        private const val SHEET_RANGE_WEBHOOK = "Sheet1!A:B"
+        // Default range for scheduled push notifications (To, Message)
+        private const val SHEET_RANGE_PUSH = "Sheet1!C:S"
     }
 
     override fun createReplyMessage(event: LineWebhookEvent.Event, botId: String): String? {
@@ -87,6 +66,27 @@ class LineBotService(
         }
         // Just return the message string. The base class will send it.
         return "Reply message: ${sheetData[0][0]} ($sourceId)"
+    }
+
+    override fun createPushNotifications(): List<Notification> {
+        // Fetch sheet data
+        val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_PUSH)
+        if (sheetData.isEmpty()) {
+            logger.info("No data found for scheduled push.")
+            return emptyList()
+        }
+
+        // Parse & Extract Notification Data
+        return sheetData.mapNotNull { row ->
+            if (row.size >= 2) {
+                Notification(
+                    to = row[0].toString(),
+                    message = row[1].toString()
+                )
+            } else {
+                null
+            }
+        }
     }
 
     private fun shouldReply(event: LineWebhookEvent.Event, botId: String): Boolean {
