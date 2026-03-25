@@ -16,15 +16,12 @@
 
 package org.fog_rock.frlineagent.sampleapp.domain.service
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
+import org.fog_rock.frlineagent.core.domain.model.Notification
 import org.fog_rock.frlineagent.core.domain.model.webhook.EventType
 import org.fog_rock.frlineagent.core.domain.model.webhook.LineWebhookEvent
 import org.fog_rock.frlineagent.core.domain.model.webhook.MessageType
-import org.fog_rock.frlineagent.sampleapp.domain.model.notification.NotificationContent
 import org.fog_rock.frlineagent.core.domain.model.webhook.SourceType
+import org.fog_rock.frlineagent.core.domain.service.AbstractLineBotService
 import org.fog_rock.frlineagent.core.domain.service.LineClient
 import org.fog_rock.frlineagent.core.domain.service.SignatureVerifier
 import org.fog_rock.frlineagent.sampleapp.domain.repository.SheetsRepository
@@ -35,50 +32,17 @@ import org.slf4j.LoggerFactory
  */
 class LineBotService(
     private val sheetsRepo: SheetsRepository,
-    private val lineClient: LineClient,
-    private val verifier: SignatureVerifier
-) {
+    lineClient: LineClient,
+    verifier: SignatureVerifier
+) : AbstractLineBotService(lineClient, verifier) {
+
     private val logger = LoggerFactory.getLogger(LineBotService::class.java)
-    private val scope = CoroutineScope(Dispatchers.Default)
-    private val json = Json { ignoreUnknownKeys = true }
 
     companion object {
         // Default range for scheduled push notifications (To, Message)
         private const val SHEET_RANGE_PUSH = "Sheet1!A:B"
         // Default range for webhook data retrieval
         private const val SHEET_RANGE_WEBHOOK = "Sheet1!C:D"
-    }
-
-    /**
-     * Handles the webhook request from LINE Platform.
-     *
-     * @param body The request body.
-     * @param signature The signature from the X-Line-Signature header.
-     * @return Result<Unit> indicating success or failure.
-     */
-    fun handleWebhook(body: String, signature: String): Result<Unit> {
-        // Verify Signature
-        if (!verifier.verify(body, signature)) {
-            val e = SecurityException("Invalid signature.")
-            logger.error(e.message)
-            return Result.failure(e)
-        }
-
-        // Parse & Process Data
-        val webhookEvent = try {
-            json.decodeFromString<LineWebhookEvent>(body)
-        } catch (e: Exception) {
-            logger.error("Failed to parse webhook event.", e)
-            return Result.failure(e)
-        }
-
-        // Launch background worker asynchronously
-        scope.launch {
-            webhookEvent.events.forEach { reply(it, webhookEvent.destination) }
-        }
-
-        // Return success immediately to acknowledge receipt
-        return Result.success(Unit)
     }
 
     /**
@@ -97,7 +61,7 @@ class LineBotService(
         // Parse & Extract Notification Data
         val notifications = sheetData.mapNotNull { row ->
             if (row.size >= 2) {
-                NotificationContent(
+                Notification(
                     to = row[0].toString(),
                     message = row[1].toString()
                 )
@@ -121,21 +85,19 @@ class LineBotService(
         return Result.success(Unit)
     }
 
-    private fun reply(event: LineWebhookEvent.Event, botId: String) {
+    override fun createReplyMessage(event: LineWebhookEvent.Event, botId: String): String? {
         if (!shouldReply(event, botId)) {
-            logger.info("Should not reply the event.")
-            return
+            logger.info("Should not reply to the event.")
+            return null
         }
-        val replyToken = event.replyToken ?: run {
-            logger.info("Event does not have the replyToken.")
-            return
-        }
+
         // Request Data from Sheets
         val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_WEBHOOK)
         if (sheetData.isEmpty()) {
-            logger.info("Not found the reply message.")
-            return
+            logger.info("No reply message found in sheet.")
+            return null
         }
+
         // Compose Success Message
         val source = event.source
         val sourceId = when (source?.sourceType) {
@@ -143,10 +105,8 @@ class LineBotService(
             SourceType.GROUP -> "GroupId: ${source.groupId}"
             else -> "SourceId: unknown"
         }
-        val message = "Reply message: ${sheetData[0][0]} ($sourceId)"
-
-        // Call Reply API
-        lineClient.reply(replyToken, message)
+        // Just return the message string. The base class will send it.
+        return "Reply message: ${sheetData[0][0]} ($sourceId)"
     }
 
     private fun shouldReply(event: LineWebhookEvent.Event, botId: String): Boolean {
@@ -166,20 +126,5 @@ class LineBotService(
             SourceType.GROUP -> message.mention?.mentionees?.any { it.userId == botId } ?: false
             else -> false
         }
-    }
-
-    private fun pushAll(notifications: List<NotificationContent>): Int {
-        var failureCount = 0
-        notifications.forEach { notification ->
-            lineClient.push(notification.to, notification.message)
-                .onSuccess {
-                    logger.info("Successfully pushed message to ${notification.to}")
-                }
-                .onFailure { e ->
-                    logger.error("Failed to push message to ${notification.to}", e)
-                    failureCount++
-                }
-        }
-        return failureCount
     }
 }
