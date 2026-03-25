@@ -32,7 +32,7 @@ class PushTriggerRoute(
 
     companion object {
         private const val MESSAGE_OK = "OK"
-        private const val MESSAGE_FAILED = "Failed to execute scheduled push."
+        private const val MESSAGE_FAILED = "Failed to execute push."
     }
 
     /**
@@ -41,9 +41,9 @@ class PushTriggerRoute(
      * @param call The application call.
      */
     suspend fun handle(call: ApplicationCall) {
-        service.executeScheduledPush()
+        service.executePush()
             .onSuccess {
-                logger.info("Successfully executed scheduled push.")
+                logger.info("Successfully executed push.")
                 call.respond(HttpStatusCode.OK, MESSAGE_OK)
             }
             .onFailure { e ->

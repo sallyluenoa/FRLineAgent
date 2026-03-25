@@ -47,6 +47,13 @@ abstract class AbstractLineBotService(
     protected open fun verifySignature(body: String, signature: String): Boolean =
         verifier.verify(body, signature)
 
+    /**
+     * Processes a single webhook event.
+     * It retrieves a reply message from `createReplyMessage` and sends it if available.
+     *
+     * @param event The webhook event to process.
+     * @param botId The destination bot ID.
+     */
     private fun processEvent(event: LineWebhookEvent.Event, botId: String) {
         val replyToken = event.replyToken ?: return // No token, no reply.
 
@@ -89,22 +96,20 @@ abstract class AbstractLineBotService(
     }
 
     /**
-     * Sends a push message.
+     * Creates a reply message for a given webhook event.
+     * Subclasses must implement this method to define the bot's reply logic.
+     * If null is returned, no reply message will be sent.
      *
-     * @param to The recipient ID.
-     * @param message The message to send.
-     * @return Result<Unit> indicating success or failure.
+     * @param event The webhook event.
+     * @param botId The destination bot ID.
+     * @return A reply message string, or null if no reply should be sent.
      */
-    protected fun push(to: String, message: String): Result<Unit> =
+    protected abstract fun createReplyMessage(event: LineWebhookEvent.Event, botId: String): String?
+
+    private fun push(to: String, message: String): Result<Unit> =
         lineClient.push(to, message)
 
-    /**
-     * Sends multiple push notifications.
-     *
-     * @param notifications A list of notifications to send.
-     * @return The number of failed pushes.
-     */
-    protected fun pushAll(notifications: List<Notification>): Int {
+    private fun pushAll(notifications: List<Notification>): Int {
         var failureCount = 0
         notifications.forEach { notification ->
             push(notification.to, notification.message)
@@ -119,24 +124,41 @@ abstract class AbstractLineBotService(
         return failureCount
     }
 
-    /**
-     * Sends a reply message.
-     *
-     * @param replyToken The token for replying.
-     * @param message The message to send.
-     * @return Result<Unit> indicating success or failure.
-     */
-    protected fun reply(replyToken: String, message: String): Result<Unit> =
+    private fun reply(replyToken: String, message: String): Result<Unit> =
         lineClient.reply(replyToken, message)
 
     /**
-     * Creates a reply message for a given webhook event.
-     * Subclasses must implement this method to define the bot's reply logic.
-     * If null is returned, no reply message will be sent.
+     * Creates a list of push notifications.
+     * Subclasses must implement this method to define the bot's push notification logic.
      *
-     * @param event The webhook event.
-     * @param botId The destination bot ID.
-     * @return A reply message string, or null if no reply should be sent.
+     * @return A list of notifications to be sent.
      */
-    protected abstract fun createReplyMessage(event: LineWebhookEvent.Event, botId: String): String?
+    protected abstract fun createPushNotifications(): List<Notification>
+
+    /**
+     * Executes the push notification process.
+     * It retrieves notifications from `createPushNotifications` and sends them.
+     *
+     * @return Result<Unit> indicating success or failure of the overall operation.
+     */
+    fun executePush(): Result<Unit> {
+        val notifications = createPushNotifications()
+        if (notifications.isEmpty()) {
+            logger.info("No notifications to push.")
+            return Result.success(Unit)
+        }
+
+        val failureCount = pushAll(notifications)
+
+        return if (failureCount > 0) {
+            val e = RuntimeException(
+                "Push notifications completed with errors. Failed: $failureCount / Total: ${notifications.size}"
+            )
+            logger.error(e.message)
+            Result.failure(e)
+        } else {
+            logger.info("All ${notifications.size} push notifications sent successfully.")
+            Result.success(Unit)
+        }
+    }
 }

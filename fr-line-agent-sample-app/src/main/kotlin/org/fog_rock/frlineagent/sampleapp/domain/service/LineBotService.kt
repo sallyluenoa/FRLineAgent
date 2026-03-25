@@ -35,7 +35,6 @@ class LineBotService(
     lineClient: LineClient,
     verifier: SignatureVerifier
 ) : AbstractLineBotService(lineClient, verifier) {
-
     private val logger = LoggerFactory.getLogger(LineBotService::class.java)
 
     companion object {
@@ -45,21 +44,16 @@ class LineBotService(
         private const val SHEET_RANGE_WEBHOOK = "Sheet1!C:D"
     }
 
-    /**
-     * Executes the scheduled push notification logic.
-     *
-     * @return Result<Unit> indicating success or failure.
-     */
-    fun executeScheduledPush(): Result<Unit> {
+    override fun createPushNotifications(): List<Notification> {
         // Fetch sheet data
         val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_PUSH)
         if (sheetData.isEmpty()) {
             logger.info("No data found for scheduled push.")
-            return Result.success(Unit)
+            return emptyList()
         }
 
         // Parse & Extract Notification Data
-        val notifications = sheetData.mapNotNull { row ->
+        return sheetData.mapNotNull { row ->
             if (row.size >= 2) {
                 Notification(
                     to = row[0].toString(),
@@ -69,20 +63,6 @@ class LineBotService(
                 null
             }
         }
-
-        // Call Push Message API
-        val failureCount = pushAll(notifications)
-
-        if (failureCount > 0) {
-            val e = RuntimeException(
-                "Push notifications completed with errors. Failed: $failureCount / Total: ${notifications.size}"
-            )
-            logger.error(e.message)
-            return Result.failure(e)
-        }
-
-        logger.info("All ${notifications.size} push notifications sent successfully.")
-        return Result.success(Unit)
     }
 
     override fun createReplyMessage(event: LineWebhookEvent.Event, botId: String): String? {
