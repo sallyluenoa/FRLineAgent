@@ -59,6 +59,7 @@ abstract class AbstractLineBotService(
         }
 
         scope.launch {
+            // Process each event by generating a reply message and sending it.
             webhookEvent.events.forEach { processEvent(it, webhookEvent.destination) }
         }
 
@@ -122,32 +123,25 @@ abstract class AbstractLineBotService(
      */
     protected abstract fun createPushNotifications(): List<Notification>
 
-    /**
-     * Processes a single webhook event.
-     * It retrieves a reply message from `createReplyMessage` and sends it if available.
-     *
-     * @param event The webhook event to process.
-     * @param botId The destination bot ID.
-     */
     private fun processEvent(event: LineWebhookEvent.Event, botId: String) {
-        val replyToken = event.replyToken ?: return // No token, no reply.
-
-        // Call the abstract method to get the message from the subclass
-        val message = createReplyMessage(event, botId)
-
-        // If the subclass provided a message, send the reply.
-        if (!message.isNullOrBlank()) {
-            reply(replyToken, message)
+        val replyToken = event.replyToken ?: run {
+            logger.warn("Event does not have a replyToken, cannot reply.")
+            return
         }
-    }
 
-    private fun reply(replyToken: String, message: String): Result<Unit> =
+        val message = createReplyMessage(event, botId)
+        if (message.isNullOrBlank()) {
+            logger.info("No reply m\\sage was generated for the event.")
+            return
+        }
+
         lineClient.reply(replyToken, message)
+    }
 
     private fun pushAll(notifications: List<Notification>): Int {
         var failureCount = 0
         notifications.forEach { notification ->
-            push(notification.to, notification.message)
+            lineClient.push(notification.to, notification.message)
                 .onSuccess {
                     logger.info("Successfully pushed message to ${notification.to}")
                 }
@@ -158,7 +152,4 @@ abstract class AbstractLineBotService(
         }
         return failureCount
     }
-
-    private fun push(to: String, message: String): Result<Unit> =
-        lineClient.push(to, message)
 }
