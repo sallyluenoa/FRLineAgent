@@ -37,7 +37,8 @@ This document defines the coding standards and project-specific constraints for 
 ## 4. Documentation
 - **KDoc:** Provide clear and concise KDoc for all public classes, interfaces, and functions.
 - **Override Methods:** Do not provide KDoc descriptions for overridden methods (methods with the `override` keyword), as they inherit documentation from their supertype.
-- **Test Code:** Do not provide KDoc for test classes or test methods. Use descriptive names for test functions to convey their purpose.
+- **Test Code:** Do not provide KDoc for test classes or test methods.
+- **Test Method Naming:** Name test functions descriptively to convey their purpose. Follow the pattern `test<TargetMethod>_<Condition>`, where `<TargetMethod>` is the method under test and `<Condition>` describes the test case (e.g., `testHandleWebhook_success`, `testExecutePush_invalidData`).
 - **Tone:** Keep all technical communication professional and objective.
 
 ## 5. Development Workflow
