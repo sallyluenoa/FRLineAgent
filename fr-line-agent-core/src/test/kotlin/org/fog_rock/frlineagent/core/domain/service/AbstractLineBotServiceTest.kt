@@ -20,7 +20,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.serialization.json.Json
-import org.fog_rock.frlineagent.core.domain.model.Notification
+import org.fog_rock.frlineagent.core.domain.model.push.Notification
 import org.fog_rock.frlineagent.core.domain.model.webhook.LineWebhookEvent
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach

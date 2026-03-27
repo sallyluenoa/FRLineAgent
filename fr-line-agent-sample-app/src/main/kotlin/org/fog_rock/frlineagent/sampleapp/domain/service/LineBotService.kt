@@ -16,7 +16,7 @@
 
 package org.fog_rock.frlineagent.sampleapp.domain.service
 
-import org.fog_rock.frlineagent.core.domain.model.Notification
+import org.fog_rock.frlineagent.core.domain.model.push.Notification
 import org.fog_rock.frlineagent.core.domain.model.webhook.EventType
 import org.fog_rock.frlineagent.core.domain.model.webhook.LineWebhookEvent
 import org.fog_rock.frlineagent.core.domain.model.webhook.MessageType

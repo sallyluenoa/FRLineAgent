@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.fog_rock.frlineagent.core.domain.model
+package org.fog_rock.frlineagent.core.domain.model.push
 
 /**
  * Represents a push notification.
