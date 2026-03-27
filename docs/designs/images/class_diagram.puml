@@ -18,8 +18,8 @@ package "fr-line-agent-sample-app" {
 
     package "Domain" {
         class LineBotService {
-            + handleWebhook(body: String, signature: String): Result<Unit>
-            + executeScheduledPush(): Result<Unit>
+            # createReplyMessage(event, botId): String?
+            # createPushNotifications(): List<Notification>
         }
         interface SheetsRepository <<interface>> {
             + fetchSheetData(range: String): List<List<Any>>
@@ -48,6 +48,12 @@ package "fr-line-agent-sample-app" {
 
 package "fr-line-agent-core" {
     package "Domain" #LightGray {
+        abstract class AbstractLineBotService {
+            + handleWebhook(body, signature): Result<Unit>
+            + executePush(): Result<Unit>
+            # {abstract} createReplyMessage(event, botId): String?
+            # {abstract} createPushNotifications(): List<Notification>
+        }
         interface LineClient <<interface>> {
             + reply(token: String, message: String): Result<Unit>
             + push(to: String, message: String): Result<Unit>
@@ -95,9 +101,10 @@ WebhookRoute --> LineBotService
 PushTriggerRoute --> LineBotService
 
 ' App Domain uses Core/App Domain interfaces
-LineBotService --> LineClient
-LineBotService --> SignatureVerifier
+LineBotService .up.|> AbstractLineBotService
 LineBotService --> SheetsRepository
+AbstractLineBotService --> LineClient
+AbstractLineBotService --> SignatureVerifier
 
 ' App Infra implements Core/App Domain interfaces
 GoogleSheetsRepositoryImpl .up.|> SheetsRepository

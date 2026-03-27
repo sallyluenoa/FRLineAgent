@@ -51,7 +51,7 @@ class PushTriggerRouteTest {
             }
         }
 
-        coEvery { service.executeScheduledPush() } returns Result.success(Unit)
+        coEvery { service.executePush() } returns Result.success(Unit)
 
         client.post("/push").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -75,11 +75,11 @@ class PushTriggerRouteTest {
             }
         }
 
-        coEvery { service.executeScheduledPush() } returns Result.failure(RuntimeException("Error"))
+        coEvery { service.executePush() } returns Result.failure(RuntimeException("Error"))
 
         client.post("/push").apply {
             assertEquals(HttpStatusCode.InternalServerError, status)
-            assertEquals("Failed to execute scheduled push.", bodyAsText())
+            assertEquals("Failed to execute push.", bodyAsText())
         }
     }
 }
