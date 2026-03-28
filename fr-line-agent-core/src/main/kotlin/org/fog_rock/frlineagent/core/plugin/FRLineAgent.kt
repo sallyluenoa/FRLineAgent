@@ -17,8 +17,21 @@
 package org.fog_rock.frlineagent.core.plugin
 
 import io.ktor.server.application.createApplicationPlugin
+import io.ktor.server.application.install
 import org.fog_rock.frlineagent.core.domain.config.ProviderMode
+import org.fog_rock.frlineagent.core.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.core.domain.service.AbstractLineBotService
+import org.fog_rock.frlineagent.core.domain.service.LineClient
+import org.fog_rock.frlineagent.core.domain.service.SignatureVerifier
+import org.fog_rock.frlineagent.core.infrastructure.cloud.GoogleSecretProvider
+import org.fog_rock.frlineagent.core.infrastructure.cloud.LineMessagingCloudClient
+import org.fog_rock.frlineagent.core.infrastructure.cloud.LineSignatureCloudVerifier
+import org.fog_rock.frlineagent.core.infrastructure.mock.LineMessagingMockClient
+import org.fog_rock.frlineagent.core.infrastructure.mock.LineSignatureMockVerifier
+import org.fog_rock.frlineagent.core.infrastructure.mock.MockSecretProvider
+import org.koin.dsl.module
+import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
@@ -33,32 +46,28 @@ val FRLineAgent = createApplicationPlugin(
     val koinModule = module {
         single<SecretProvider> {
             when (pluginConfig.secretManagerMode) {
-                ProviderMode.CLOUD -> GoogleSecretProvider(
-                    pluginConfig.googleCloudProjectNumber!!,
-                    pluginConfig.googleCloudCredentialsKey!!
-                )
+                ProviderMode.CLOUD -> GoogleSecretProvider(pluginConfig.googleCloudProjectNumber!!)
                 ProviderMode.MOCK -> MockSecretProvider()
             }
         }
         single<LineClient> {
             when (pluginConfig.lineApiMode) {
-                ProviderMode.CLOUD -> LineMessagingCloudClient(
-                    get(),
-                    pluginConfig.lineBotChannelAccessTokenKey!!
-                )
+                ProviderMode.CLOUD -> {
+                    val channelAccessToken = get<SecretProvider>().getSecret(pluginConfig.lineBotChannelAccessTokenKey!!)
+                    LineMessagingCloudClient(channelAccessToken)
+                }
                 ProviderMode.MOCK -> LineMessagingMockClient()
             }
         }
         single<SignatureVerifier> {
             when (pluginConfig.lineApiMode) {
-                ProviderMode.CLOUD -> LineSignatureCloudVerifier(
-                    get(),
-                    pluginConfig.lineBotChannelSecretKey!!
-                )
+                ProviderMode.CLOUD -> {
+                    val channelSecret = get<SecretProvider>().getSecret(pluginConfig.lineBotChannelSecretKey!!)
+                    LineSignatureCloudVerifier(channelSecret)
+                }
                 ProviderMode.MOCK -> LineSignatureMockVerifier()
             }
         }
-        single { pluginConfig.lineBotService.java.constructors.first().newInstance(get(), get(), get()) as AbstractLineBotService }
     }
 
     application.install(Koin) {
