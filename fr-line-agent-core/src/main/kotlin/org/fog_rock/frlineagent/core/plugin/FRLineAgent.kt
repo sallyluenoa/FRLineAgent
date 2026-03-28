@@ -20,7 +20,6 @@ import io.ktor.server.application.createApplicationPlugin
 import io.ktor.server.application.install
 import org.fog_rock.frlineagent.core.domain.config.ProviderMode
 import org.fog_rock.frlineagent.core.domain.repository.SecretProvider
-import org.fog_rock.frlineagent.core.domain.service.AbstractLineBotService
 import org.fog_rock.frlineagent.core.domain.service.LineClient
 import org.fog_rock.frlineagent.core.domain.service.SignatureVerifier
 import org.fog_rock.frlineagent.core.infrastructure.cloud.GoogleSecretProvider
@@ -32,8 +31,6 @@ import org.fog_rock.frlineagent.core.infrastructure.mock.MockSecretProvider
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
-import kotlin.properties.Delegates
-import kotlin.reflect.KClass
 
 /**
  * A Ktor plugin for FRLineAgent.
@@ -74,47 +71,4 @@ val FRLineAgent = createApplicationPlugin(
         slf4jLogger()
         modules(koinModule)
     }
-}
-
-/**
- * A configuration for the FRLineAgent plugin.
- */
-class Configuration {
-    /**
-     * The mode for providing secrets (e.g., from Google Secret Manager or mock).
-     * Defaults to [ProviderMode.CLOUD].
-     */
-    var secretManagerMode: ProviderMode = ProviderMode.CLOUD
-
-    /**
-     * The mode for interacting with the LINE API (e.g., actual cloud API or mock).
-     * Defaults to [ProviderMode.CLOUD].
-     */
-    var lineApiMode: ProviderMode = ProviderMode.CLOUD
-
-    /**
-     * The Google Cloud Project number. Required when [secretManagerMode] is [ProviderMode.CLOUD].
-     */
-    var googleCloudProjectNumber: String? = null
-
-    /**
-     * The key for retrieving Google Cloud credentials from Secret Manager.
-     */
-    var googleCloudCredentialsKey: String? = null
-
-    /**
-     * The key for retrieving the LINE Bot channel access token from Secret Manager.
-     */
-    var lineBotChannelAccessTokenKey: String? = null
-
-    /**
-     * The key for retrieving the LINE Bot channel secret from Secret Manager.
-     */
-    var lineBotChannelSecretKey: String? = null
-
-    /**
-     * The implementation class of [AbstractLineBotService] that contains the bot's business logic.
-     * This property must be set during the plugin installation.
-     */
-    var lineBotService: KClass<out AbstractLineBotService> by Delegates.notNull()
 }
