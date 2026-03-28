@@ -11,6 +11,7 @@ This document defines the coding standards and project-specific constraints for 
 - **Code Style:** Refer to the `.editorconfig` file located in the project root for detailed formatting rules (indentation, spacing, etc.).
 - **Imports:** - Include only necessary import statements.
     - **No Wildcard Imports:** Do not use asterisks (`*`) for imports; specify each class or function explicitly.
+- **Null Safety:** Avoid using the not-null assertion operator (`!!`). Instead, prefer safe calls (`?.`), the Elvis operator (`?:`), or explicit checks that throw meaningful exceptions (e.g., `requireNotNull`, `checkNotNull`).
 
 ## 3. File Header and Copyright
 - **Copyright Notice:** Every new class or file must include the following Apache License 2.0 header.

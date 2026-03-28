@@ -43,15 +43,22 @@ val FRLineAgent = createApplicationPlugin(
     val koinModule = module {
         single<SecretProvider> {
             when (pluginConfig.secretManagerMode) {
-                ProviderMode.CLOUD -> GoogleSecretProvider(pluginConfig.googleCloudProjectNumber!!)
+                ProviderMode.CLOUD -> {
+                    val projectNumber = requireNotNull(pluginConfig.googleCloudProjectNumber) {
+                        "googleCloudProjectNumber must be set when secretManagerMode is CLOUD."
+                    }
+                    GoogleSecretProvider(projectNumber)
+                }
                 ProviderMode.MOCK -> MockSecretProvider()
             }
         }
         single<LineClient> {
             when (pluginConfig.lineApiMode) {
                 ProviderMode.CLOUD -> {
-                    val channelAccessToken = get<SecretProvider>().getSecret(pluginConfig.lineBotChannelAccessTokenKey!!)
-                    LineMessagingCloudClient(channelAccessToken)
+                    val accessTokenKey = requireNotNull(pluginConfig.lineBotChannelAccessTokenKey) {
+                        "lineBotChannelAccessTokenKey must be set when lineApiMode is CLOUD."
+                    }
+                    LineMessagingCloudClient(get<SecretProvider>().getSecret(accessTokenKey))
                 }
                 ProviderMode.MOCK -> LineMessagingMockClient()
             }
@@ -59,8 +66,10 @@ val FRLineAgent = createApplicationPlugin(
         single<SignatureVerifier> {
             when (pluginConfig.lineApiMode) {
                 ProviderMode.CLOUD -> {
-                    val channelSecret = get<SecretProvider>().getSecret(pluginConfig.lineBotChannelSecretKey!!)
-                    LineSignatureCloudVerifier(channelSecret)
+                    val secretKey = requireNotNull(pluginConfig.lineBotChannelSecretKey) {
+                        "lineBotChannelSecretKey must be set when lineApiMode is CLOUD."
+                    }
+                    LineSignatureCloudVerifier(get<SecretProvider>().getSecret(secretKey))
                 }
                 ProviderMode.MOCK -> LineSignatureMockVerifier()
             }
