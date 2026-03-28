@@ -24,6 +24,7 @@ kotlin {
 }
 
 dependencies {
+    api(libs.ktor.server.core)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.logback.classic)
