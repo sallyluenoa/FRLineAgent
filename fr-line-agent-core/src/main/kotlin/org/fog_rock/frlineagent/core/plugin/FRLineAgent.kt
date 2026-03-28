@@ -30,7 +30,41 @@ val FRLineAgent = createApplicationPlugin(
     name = "FRLineAgent",
     createConfiguration = ::Configuration
 ) {
-    // TODO: DI (Dependency Injection) modules will be configured here.
+    val koinModule = module {
+        single<SecretProvider> {
+            when (pluginConfig.secretManagerMode) {
+                ProviderMode.CLOUD -> GoogleSecretProvider(
+                    pluginConfig.googleCloudProjectNumber!!,
+                    pluginConfig.googleCloudCredentialsKey!!
+                )
+                ProviderMode.MOCK -> MockSecretProvider()
+            }
+        }
+        single<LineClient> {
+            when (pluginConfig.lineApiMode) {
+                ProviderMode.CLOUD -> LineMessagingCloudClient(
+                    get(),
+                    pluginConfig.lineBotChannelAccessTokenKey!!
+                )
+                ProviderMode.MOCK -> LineMessagingMockClient()
+            }
+        }
+        single<SignatureVerifier> {
+            when (pluginConfig.lineApiMode) {
+                ProviderMode.CLOUD -> LineSignatureCloudVerifier(
+                    get(),
+                    pluginConfig.lineBotChannelSecretKey!!
+                )
+                ProviderMode.MOCK -> LineSignatureMockVerifier()
+            }
+        }
+        single { pluginConfig.lineBotService.java.constructors.first().newInstance(get(), get(), get()) as AbstractLineBotService }
+    }
+
+    application.install(Koin) {
+        slf4jLogger()
+        modules(koinModule)
+    }
 }
 
 /**

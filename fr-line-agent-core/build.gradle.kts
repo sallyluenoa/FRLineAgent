@@ -25,6 +25,8 @@ kotlin {
 
 dependencies {
     api(libs.ktor.server.core)
+    api(libs.koin.ktor)
+    api(libs.koin.logger.slf4j)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.logback.classic)
