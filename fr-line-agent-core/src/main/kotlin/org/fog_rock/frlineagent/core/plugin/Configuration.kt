@@ -18,6 +18,7 @@ package org.fog_rock.frlineagent.core.plugin
 
 import org.fog_rock.frlineagent.core.domain.config.ProviderMode
 import org.fog_rock.frlineagent.core.domain.service.AbstractLineBotService
+import org.koin.core.module.Module
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
@@ -62,4 +63,9 @@ class Configuration {
      * This property must be set during the plugin installation.
      */
     var lineBotService: KClass<out AbstractLineBotService> by Delegates.notNull()
+
+    /**
+     * An application-specific Koin module to be loaded along with the core module.
+     */
+    var appModule: Module? = null
 }

@@ -78,6 +78,7 @@ val FRLineAgent = createApplicationPlugin(
 
     application.install(Koin) {
         slf4jLogger()
-        modules(koinModule)
+        val allModules = listOfNotNull(koinModule, pluginConfig.appModule)
+        modules(allModules)
     }
 }
