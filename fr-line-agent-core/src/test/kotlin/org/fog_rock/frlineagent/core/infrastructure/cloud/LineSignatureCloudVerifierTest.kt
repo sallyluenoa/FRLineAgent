@@ -18,12 +18,9 @@ package org.fog_rock.frlineagent.core.infrastructure.cloud
 
 import com.linecorp.bot.parser.LineSignatureValidator
 import io.mockk.every
-import io.mockk.mockk
 import io.mockk.mockkConstructor
 import io.mockk.unmockkAll
 import io.mockk.verify
-import org.fog_rock.frlineagent.core.domain.config.AppConfig
-import org.fog_rock.frlineagent.core.domain.repository.SecretProvider
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -32,21 +29,12 @@ import org.junit.jupiter.api.Test
 
 class LineSignatureCloudVerifierTest {
 
-    private lateinit var appConfig: AppConfig
-    private lateinit var secretProvider: SecretProvider
     private lateinit var verifier: LineSignatureCloudVerifier
 
     @BeforeEach
     fun setUp() {
-        appConfig = mockk()
-        secretProvider = mockk()
-
-        every { appConfig.lineBotChannelSecretKey } returns "test-secret-key"
-        every { secretProvider.getSecret("test-secret-key") } returns "test-secret"
-
         mockkConstructor(LineSignatureValidator::class)
-
-        verifier = LineSignatureCloudVerifier(appConfig, secretProvider)
+        verifier = LineSignatureCloudVerifier("test-secret")
     }
 
     @AfterEach
