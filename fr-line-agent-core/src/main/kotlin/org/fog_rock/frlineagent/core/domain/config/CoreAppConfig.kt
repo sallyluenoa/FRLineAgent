@@ -19,7 +19,7 @@ package org.fog_rock.frlineagent.core.domain.config
 /**
  * An interface for managing the integration mode with external services.
  */
-interface AppConfig {
+interface CoreAppConfig {
     /** Application Name. */
     val name: String
 
@@ -30,8 +30,6 @@ interface AppConfig {
 
     /** Google Cloud Project ID. */
     val googleCloudProjectNumber: String
-    /** Key for Google Credentials in Secret Manager. */
-    val googleCloudCredentialsKey: String
 
     /** Key for LINE Channel Access Token in Secret Manager. */
     val lineBotChannelAccessTokenKey: String

@@ -44,11 +44,6 @@ class Configuration {
     var googleCloudProjectNumber: String? = null
 
     /**
-     * The key for retrieving Google Cloud credentials from Secret Manager.
-     */
-    var googleCloudCredentialsKey: String? = null
-
-    /**
      * The key for retrieving the LINE Bot channel access token from Secret Manager.
      */
     var lineBotChannelAccessTokenKey: String? = null
