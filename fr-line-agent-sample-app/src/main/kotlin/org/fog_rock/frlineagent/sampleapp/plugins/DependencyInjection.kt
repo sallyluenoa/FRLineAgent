@@ -27,7 +27,7 @@ import org.koin.dsl.module
 /**
  * A Koin module for application-specific dependencies.
  */
-val appModule = module {
+val sampleAppModule = module {
     single<AppConfig> { KtorAppConfig(get<Application>().environment.config) }
     single<SheetsRepository> { GoogleSheetsRepositoryImpl(get(), get()) }
     single { LineBotService(get(), get(), get()) }

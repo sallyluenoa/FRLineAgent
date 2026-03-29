@@ -21,7 +21,7 @@ import io.ktor.server.application.install
 import org.fog_rock.frlineagent.core.plugin.FRLineAgent
 import org.fog_rock.frlineagent.sampleapp.domain.service.LineBotService
 import org.fog_rock.frlineagent.sampleapp.infrastructure.config.KtorAppConfig
-import org.fog_rock.frlineagent.sampleapp.plugins.appModule as sampleAppModule
+import org.fog_rock.frlineagent.sampleapp.plugins.sampleAppModule
 import org.fog_rock.frlineagent.sampleapp.plugins.configureMonitoring
 import org.fog_rock.frlineagent.sampleapp.plugins.configureRouting
 import org.fog_rock.frlineagent.sampleapp.plugins.configureSerialization
