@@ -17,18 +17,32 @@
 package org.fog_rock.frlineagent.sampleapp
 
 import io.ktor.server.application.Application
-import org.fog_rock.frlineagent.sampleapp.plugins.configureDI
+import io.ktor.server.application.install
+import org.fog_rock.frlineagent.core.plugin.FRLineAgent
+import org.fog_rock.frlineagent.sampleapp.domain.service.LineBotService
+import org.fog_rock.frlineagent.sampleapp.infrastructure.config.KtorAppConfig
+import org.fog_rock.frlineagent.sampleapp.plugins.appModule as sampleAppModule
 import org.fog_rock.frlineagent.sampleapp.plugins.configureMonitoring
 import org.fog_rock.frlineagent.sampleapp.plugins.configureRouting
 import org.fog_rock.frlineagent.sampleapp.plugins.configureSerialization
 
-fun main(args: Array<String>) {
+fun main(args: Array<String>): Unit =
     io.ktor.server.netty.EngineMain.main(args)
-}
 
 fun Application.module() {
-    configureDI()
-    configureSerialization()
+    val config = KtorAppConfig(environment.config)
+
+    install(FRLineAgent) {
+        secretManagerMode = config.secretManagerMode
+        googleCloudProjectNumber = config.googleCloudProjectNumber
+        lineApiMode = config.lineApiMode
+        lineBotChannelSecretKey = config.lineBotChannelSecretKey
+        lineBotChannelAccessTokenKey = config.lineBotChannelAccessTokenKey
+        lineBotService = LineBotService::class
+        appModule = sampleAppModule
+    }
+
     configureMonitoring()
+    configureSerialization()
     configureRouting()
 }

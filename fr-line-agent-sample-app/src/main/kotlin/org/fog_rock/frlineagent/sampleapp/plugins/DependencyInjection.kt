@@ -17,37 +17,18 @@
 package org.fog_rock.frlineagent.sampleapp.plugins
 
 import io.ktor.server.application.Application
-import io.ktor.server.application.install
 import org.fog_rock.frlineagent.sampleapp.domain.config.AppConfig
-import org.fog_rock.frlineagent.core.domain.repository.SecretProvider
 import org.fog_rock.frlineagent.sampleapp.domain.repository.SheetsRepository
 import org.fog_rock.frlineagent.sampleapp.domain.service.LineBotService
-import org.fog_rock.frlineagent.core.domain.service.LineClient
-import org.fog_rock.frlineagent.core.domain.service.SignatureVerifier
 import org.fog_rock.frlineagent.sampleapp.infrastructure.config.KtorAppConfig
-import org.fog_rock.frlineagent.sampleapp.infrastructure.external.SecretManagerProvider
 import org.fog_rock.frlineagent.sampleapp.infrastructure.repository.GoogleSheetsRepositoryImpl
-import org.fog_rock.frlineagent.sampleapp.infrastructure.service.LineMessagingClientImpl
-import org.fog_rock.frlineagent.sampleapp.infrastructure.service.LineSignatureVerifierImpl
-import org.fog_rock.frlineagent.sampleapp.presentation.PushTriggerRoute
-import org.fog_rock.frlineagent.sampleapp.presentation.WebhookRoute
 import org.koin.dsl.module
-import org.koin.ktor.plugin.Koin
-import org.koin.logger.slf4jLogger
 
-fun Application.configureDI() {
-    install(Koin) {
-        slf4jLogger()
-        val koinModule = module {
-            single<AppConfig> { KtorAppConfig(environment.config) }
-            single<SecretProvider> { SecretManagerProvider(get()) }
-            single<SheetsRepository> { GoogleSheetsRepositoryImpl(get(), get()) }
-            single<LineClient> { LineMessagingClientImpl(get(), get()) }
-            single<SignatureVerifier> { LineSignatureVerifierImpl(get(), get()) }
-            single { LineBotService(get(), get(), get()) }
-            single { WebhookRoute(get()) }
-            single { PushTriggerRoute(get()) }
-        }
-        modules(koinModule)
-    }
+/**
+ * A Koin module for application-specific dependencies.
+ */
+val appModule = module {
+    single<AppConfig> { KtorAppConfig(get<Application>().environment.config) }
+    single<SheetsRepository> { GoogleSheetsRepositoryImpl(get(), get()) }
+    single { LineBotService(get(), get(), get()) }
 }
