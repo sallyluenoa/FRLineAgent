@@ -19,7 +19,7 @@ package org.fog_rock.frlineagent.core.infrastructure.mock
 import org.fog_rock.frlineagent.core.domain.service.SignatureVerifier
 import org.slf4j.LoggerFactory
 
-class LineSignatureMockVerifier : SignatureVerifier {
+internal class LineSignatureMockVerifier : SignatureVerifier {
 
     private val logger = LoggerFactory.getLogger(LineSignatureMockVerifier::class.java)
 

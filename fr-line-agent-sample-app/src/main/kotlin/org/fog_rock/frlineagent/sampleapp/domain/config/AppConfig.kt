@@ -16,14 +16,17 @@
 
 package org.fog_rock.frlineagent.sampleapp.domain.config
 
+import org.fog_rock.frlineagent.core.domain.config.CoreAppConfig
 import org.fog_rock.frlineagent.core.domain.config.ProviderMode
 
 /**
  * An interface for managing the integration mode with external services.
  */
-interface AppConfig : org.fog_rock.frlineagent.core.domain.config.AppConfig {
+interface AppConfig : CoreAppConfig {
     /** Mode for Spreadsheet. */
     val spreadsheetMode: ProviderMode
+    /** Key for Google Credentials in Secret Manager. */
+    val googleCloudCredentialsKey: String
     /** Key for Spreadsheet ID in Secret Manager. */
     val googleSheetsSpreadsheetIdKey: String
 }

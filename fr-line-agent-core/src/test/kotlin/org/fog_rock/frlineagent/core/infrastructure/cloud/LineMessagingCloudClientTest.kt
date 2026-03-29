@@ -21,43 +21,34 @@ import com.linecorp.bot.messaging.model.PushMessageRequest
 import com.linecorp.bot.messaging.model.PushMessageResponse
 import com.linecorp.bot.messaging.model.ReplyMessageRequest
 import com.linecorp.bot.messaging.model.ReplyMessageResponse
-import com.linecorp.bot.client.base.Result as LineResult
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
-import org.fog_rock.frlineagent.core.domain.config.AppConfig
-import org.fog_rock.frlineagent.core.domain.repository.SecretProvider
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+import com.linecorp.bot.client.base.Result as LineResult
 
 class LineMessagingCloudClientTest {
 
-    private lateinit var appConfig: AppConfig
-    private lateinit var secretProvider: SecretProvider
     private lateinit var messagingApiClient: MessagingApiClient
     private lateinit var client: LineMessagingCloudClient
 
     @BeforeEach
     fun setUp() {
-        appConfig = mockk()
-        secretProvider = mockk()
         messagingApiClient = mockk()
-
-        every { appConfig.lineBotChannelAccessTokenKey } returns "test-token-key"
-        every { secretProvider.getSecret("test-token-key") } returns "test-token"
 
         mockkStatic(MessagingApiClient::class)
         val builder = mockk<com.linecorp.bot.client.base.ApiAuthenticatedClientBuilder<MessagingApiClient>>()
         every { MessagingApiClient.builder("test-token") } returns builder
         every { builder.build() } returns messagingApiClient
 
-        client = LineMessagingCloudClient(appConfig, secretProvider)
+        client = LineMessagingCloudClient("test-token")
     }
 
     @AfterEach
