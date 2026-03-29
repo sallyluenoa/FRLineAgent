@@ -22,13 +22,17 @@ import org.fog_rock.frlineagent.sampleapp.domain.repository.SheetsRepository
 import org.fog_rock.frlineagent.sampleapp.domain.service.LineBotService
 import org.fog_rock.frlineagent.sampleapp.infrastructure.config.KtorAppConfig
 import org.fog_rock.frlineagent.sampleapp.infrastructure.repository.GoogleSheetsRepositoryImpl
+import org.fog_rock.frlineagent.sampleapp.presentation.PushTriggerRoute
+import org.fog_rock.frlineagent.sampleapp.presentation.WebhookRoute
 import org.koin.dsl.module
 
 /**
  * A Koin module for application-specific dependencies.
  */
-val sampleAppModule = module {
-    single<AppConfig> { KtorAppConfig(get<Application>().environment.config) }
+fun sampleAppModule(app: Application) = module {
+    single<AppConfig> { KtorAppConfig(app.environment.config) }
     single<SheetsRepository> { GoogleSheetsRepositoryImpl(get(), get()) }
     single { LineBotService(get(), get(), get()) }
+    single { WebhookRoute(get()) }
+    single { PushTriggerRoute(get()) }
 }

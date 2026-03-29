@@ -39,7 +39,7 @@ fun Application.module() {
         lineBotChannelSecretKey = config.lineBotChannelSecretKey
         lineBotChannelAccessTokenKey = config.lineBotChannelAccessTokenKey
         lineBotService = LineBotService::class
-        appModule = sampleAppModule
+        appModule = sampleAppModule(this@module)
     }
 
     configureMonitoring()
