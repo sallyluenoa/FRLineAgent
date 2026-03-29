@@ -24,7 +24,7 @@ import org.fog_rock.frlineagent.core.domain.service.LineClient
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
-class LineMessagingCloudClient(private val channelAccessToken: String) : LineClient {
+internal class LineMessagingCloudClient(private val channelAccessToken: String) : LineClient {
 
     private val logger = LoggerFactory.getLogger(LineMessagingCloudClient::class.java)
 

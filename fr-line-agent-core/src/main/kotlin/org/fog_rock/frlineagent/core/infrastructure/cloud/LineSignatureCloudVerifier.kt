@@ -21,7 +21,7 @@ import org.fog_rock.frlineagent.core.domain.service.SignatureVerifier
 import org.slf4j.LoggerFactory
 import java.nio.charset.StandardCharsets
 
-class LineSignatureCloudVerifier(private val channelSecret: String) : SignatureVerifier {
+internal class LineSignatureCloudVerifier(private val channelSecret: String) : SignatureVerifier {
 
     private val logger = LoggerFactory.getLogger(LineSignatureCloudVerifier::class.java)
 
