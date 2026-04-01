@@ -14,6 +14,46 @@ This project is built using the following technologies:
 - **Logging**: Logback
 - **Platform**: Google Cloud Run (Target deployment)
 
+## How to Use as a Library
+
+To include the `fr-line-agent-core` library in your own project, follow these steps.
+
+### 1. Add the Repository
+
+First, you need to configure your project to fetch dependencies from GitHub Packages. Add the following repository configuration to your `settings.gradle.kts`.
+
+You will need a Personal Access Token (PAT) with `read:packages` scope to authenticate. It's recommended to provide your GitHub username and the PAT via environment variables.
+
+```kotlin
+// settings.gradle.kts
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral() // Keep other repositories you need
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/SallyLueNoa/FRLineAgent")
+            credentials {
+                username = System.getenv("GITHUB_USER")
+                password = System.getenv("GITHUB_TOKEN") // Use your PAT here
+            }
+        }
+    }
+}
+```
+
+### 2. Add the Dependency
+
+Next, add the `fr-line-agent-core` library to your module's dependencies in the `build.gradle.kts` file.
+
+Replace `LATEST_VERSION` with the latest version number you see in the [Packages](https://github.com/SallyLueNoa/FRLineAgent/packages) section of the repository.
+
+```kotlin
+// build.gradle.kts
+dependencies {
+    implementation("org.fog_rock:fr-line-agent-core:LATEST_VERSION")
+}
+```
+
 ## How to Run
 
 ### Prerequisites
