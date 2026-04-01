@@ -2,7 +2,7 @@
 name: Maintenance
 about: Maintain the project
 title: '[Maintenance]'
-labels: ''
+labels: 'maintenance'
 assignees: 'sallyluenoa'
 
 ---
