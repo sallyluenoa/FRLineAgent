@@ -1,7 +1,8 @@
 ### Pre-merge Checklist
 
-- [ ] Milestone is set.
+- [ ] Assignees are set.
 - [ ] Labels are set.
+- [ ] Milestone is set.
 
 ---
 
