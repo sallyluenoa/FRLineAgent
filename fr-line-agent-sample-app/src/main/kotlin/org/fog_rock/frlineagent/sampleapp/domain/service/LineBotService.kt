@@ -39,9 +39,9 @@ class LineBotService(
 
     companion object {
         // Default range for webhook data retrieval
-        private const val SHEET_RANGE_WEBHOOK = "Sheet1!A:B"
+        private const val SHEET_RANGE_WEBHOOK = "webhook"
         // Default range for scheduled push notifications (To, Message)
-        private const val SHEET_RANGE_PUSH = "Sheet1!C:S"
+        private const val SHEET_RANGE_PUSH = "push"
     }
 
     override fun createReplyMessage(event: LineWebhookEvent.Event, botId: String): String? {
@@ -52,20 +52,13 @@ class LineBotService(
 
         // Request Data from Sheets
         val sheetData = sheetsRepo.fetchSheetData(SHEET_RANGE_WEBHOOK)
-        if (sheetData.isEmpty()) {
+        if (sheetData.isEmpty() || sheetData[0].isEmpty()) {
             logger.info("No reply message found in sheet.")
             return null
         }
 
-        // Compose Success Message
-        val source = event.source
-        val sourceId = when (source?.sourceType) {
-            SourceType.USER -> "UserId: ${source.userId}"
-            SourceType.GROUP -> "GroupId: ${source.groupId}"
-            else -> "SourceId: unknown"
-        }
         // Just return the message string. The base class will send it.
-        return "Reply message: ${sheetData[0][0]} ($sourceId)"
+        return sheetData[0][0].toString()
     }
 
     override fun createPushNotifications(): List<Notification> {
