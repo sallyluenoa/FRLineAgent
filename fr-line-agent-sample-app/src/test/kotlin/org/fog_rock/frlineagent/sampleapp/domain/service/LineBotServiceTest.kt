@@ -96,7 +96,7 @@ class LineBotServiceTest {
         // Arrange
         val event = createMessageEvent(sourceType = SourceType.USER, userId = "user1")
         val body = createWebhookJson(event)
-        every { sheetsRepo.fetchSheetData(any()) } returns listOf(listOf("Reply Message"))
+        every { sheetsRepo.fetchSheetData("webhook") } returns listOf(listOf("Reply Message"))
         every { lineClient.reply(any(), any()) } returns Result.success(Unit)
 
         // Act
@@ -104,7 +104,7 @@ class LineBotServiceTest {
 
         // Assert
         assertTrue(result.isSuccess)
-        verify(timeout = 1000) { lineClient.reply("replyToken", any()) }
+        verify(timeout = 1000) { lineClient.reply("replyToken", "Reply Message") }
     }
 
     @Test
@@ -117,7 +117,7 @@ class LineBotServiceTest {
             mentionees = mentionees
         )
         val body = createWebhookJson(event)
-        every { sheetsRepo.fetchSheetData(any()) } returns listOf(listOf("Reply Message"))
+        every { sheetsRepo.fetchSheetData("webhook") } returns listOf(listOf("Reply Message"))
         every { lineClient.reply(any(), any()) } returns Result.success(Unit)
 
         // Act
@@ -125,7 +125,7 @@ class LineBotServiceTest {
 
         // Assert
         assertTrue(result.isSuccess)
-        verify(timeout = 1000) { lineClient.reply("replyToken", any()) }
+        verify(timeout = 1000) { lineClient.reply("replyToken", "Reply Message") }
     }
 
     @Test
@@ -182,7 +182,7 @@ class LineBotServiceTest {
     @Test
     fun testExecutePush_withValidData() {
         // Arrange
-        every { sheetsRepo.fetchSheetData(any()) } returns listOf(
+        every { sheetsRepo.fetchSheetData("push") } returns listOf(
             listOf("user1", "message1"),
             listOf("user2", "message2")
         )
@@ -200,7 +200,7 @@ class LineBotServiceTest {
     @Test
     fun testExecutePush_withEmptyData() {
         // Arrange
-        every { sheetsRepo.fetchSheetData(any()) } returns emptyList()
+        every { sheetsRepo.fetchSheetData("push") } returns emptyList()
 
         // Act
         val result = service.executePush()
@@ -213,7 +213,7 @@ class LineBotServiceTest {
     @Test
     fun testExecutePush_withPartialFailure() {
         // Arrange
-        every { sheetsRepo.fetchSheetData(any()) } returns listOf(
+        every { sheetsRepo.fetchSheetData("push") } returns listOf(
             listOf("user1", "message1"),
             listOf("user2", "message2")
         )
