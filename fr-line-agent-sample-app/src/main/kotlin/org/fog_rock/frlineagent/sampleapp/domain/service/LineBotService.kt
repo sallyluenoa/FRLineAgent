@@ -95,9 +95,19 @@ class LineBotService(
         val source = event.source
         logger.info("sourceType: ${source?.sourceType}")
         return when (source?.sourceType) {
-            SourceType.USER -> true
-            SourceType.GROUP -> message.mention?.mentionees?.any { it.userId == botId } ?: false
-            else -> false
+            SourceType.USER -> {
+                logger.info("Source type is USER. Replying.")
+                true
+            }
+            SourceType.GROUP -> {
+                val shouldReplyToGroup = message.mention?.mentionees?.any { it.userId == botId } ?: false
+                logger.info("Source type is GROUP. Bot mentioned: $shouldReplyToGroup")
+                shouldReplyToGroup
+            }
+            else -> {
+                logger.info("Source type is ${source?.sourceType}. Not replying.")
+                false
+            }
         }
     }
 }
