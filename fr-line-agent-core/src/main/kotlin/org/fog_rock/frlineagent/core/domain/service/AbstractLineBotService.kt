@@ -46,9 +46,8 @@ abstract class AbstractLineBotService(
      */
     fun handleWebhook(body: String, signature: String): Result<Unit> {
         if (!verifySignature(body, signature)) {
-            val e = SecurityException("Invalid signature.")
-            logger.error(e.message)
-            return Result.failure(e)
+            logger.error("Invalid signature.")
+            return Result.failure(SecurityException("Invalid signature."))
         }
 
         val webhookEvent = try {
@@ -59,6 +58,7 @@ abstract class AbstractLineBotService(
         }
 
         scope.launch {
+            logger.info("Starting to process ${webhookEvent.events.size} webhook events asynchronously.")
             // Process each event by generating a reply message and sending it.
             webhookEvent.events.forEach { processEvent(it, webhookEvent.destination) }
         }
@@ -82,11 +82,9 @@ abstract class AbstractLineBotService(
         val failureCount = pushAll(notifications)
 
         return if (failureCount > 0) {
-            val e = RuntimeException(
-                "Push notifications completed with errors. Failed: $failureCount / Total: ${notifications.size}"
-            )
-            logger.error(e.message)
-            Result.failure(e)
+            val errorMessage = "Push notifications completed with errors. Failed: $failureCount / Total: ${notifications.size}"
+            logger.error(errorMessage)
+            Result.failure(RuntimeException(errorMessage))
         } else {
             logger.info("All ${notifications.size} push notifications sent successfully.")
             Result.success(Unit)
@@ -131,10 +129,11 @@ abstract class AbstractLineBotService(
 
         val message = createReplyMessage(event, botId)
         if (message.isNullOrBlank()) {
-            logger.info("No reply m\\sage was generated for the event.")
+            logger.info("No reply message was generated for the event.")
             return
         }
 
+        logger.info("Sending reply for replyToken: $replyToken")
         lineClient.reply(replyToken, message)
     }
 
