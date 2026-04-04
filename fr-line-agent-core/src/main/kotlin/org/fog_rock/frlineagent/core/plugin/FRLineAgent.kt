@@ -49,7 +49,15 @@ val FRLineAgent = createApplicationPlugin(
                     }
                     GoogleSecretProvider(projectNumber)
                 }
-                ProviderMode.MOCK -> MockSecretProvider()
+                ProviderMode.MOCK -> {
+                    val mockSecrets = mapOf(
+                        "LINE_CHANNEL_ACCESS_TOKEN" to "mock_line_channel_access_token",
+                        "LINE_CHANNEL_SECRET" to "mock_line_channel_secret",
+                        "SPREADSHEET_ID" to "mock_spreadsheet_id",
+                        "GOOGLE_CREDENTIALS_JSON" to "{}"
+                    )
+                    MockSecretProvider(mockSecrets)
+                }
             }
         }
         single<LineClient> {
