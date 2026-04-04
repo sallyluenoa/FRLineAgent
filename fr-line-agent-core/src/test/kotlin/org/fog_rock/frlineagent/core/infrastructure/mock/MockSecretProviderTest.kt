@@ -22,18 +22,29 @@ import org.junit.jupiter.api.assertThrows
 
 class MockSecretProviderTest {
 
-    private val secretProvider = MockSecretProvider()
-
     @Test
     fun testGetSecret_success() {
-        assertEquals("mock_line_channel_access_token", secretProvider.getSecret("LINE_CHANNEL_ACCESS_TOKEN"))
-        assertEquals("mock_line_channel_secret", secretProvider.getSecret("LINE_CHANNEL_SECRET"))
-        assertEquals("mock_spreadsheet_id", secretProvider.getSecret("SPREADSHEET_ID"))
-        assertEquals("{}", secretProvider.getSecret("GOOGLE_CREDENTIALS_JSON"))
+        val secrets = mapOf(
+            "LINE_CHANNEL_ACCESS_TOKEN" to "custom_line_channel_access_token",
+            "CUSTOM_KEY" to "custom_value"
+        )
+        val secretProvider = MockSecretProvider(secrets)
+
+        assertEquals("custom_line_channel_access_token", secretProvider.getSecret("LINE_CHANNEL_ACCESS_TOKEN"))
+        assertEquals("custom_value", secretProvider.getSecret("CUSTOM_KEY"))
     }
 
     @Test
     fun testGetSecret_failure() {
+        // Test with empty secrets.
+        val emptySecretProvider = MockSecretProvider()
+        assertThrows<IllegalArgumentException> {
+            emptySecretProvider.getSecret("UNKNOWN_KEY")
+        }
+
+        // Test with non-empty secrets.
+        val secrets = mapOf("EXISTING_KEY" to "EXISTING_VALUE")
+        val secretProvider = MockSecretProvider(secrets)
         assertThrows<IllegalArgumentException> {
             secretProvider.getSecret("UNKNOWN_KEY")
         }

@@ -18,13 +18,9 @@ package org.fog_rock.frlineagent.core.infrastructure.mock
 
 import org.fog_rock.frlineagent.core.domain.repository.SecretProvider
 
-internal class MockSecretProvider : SecretProvider {
-    private val secrets = mapOf(
-        "LINE_CHANNEL_ACCESS_TOKEN" to "mock_line_channel_access_token",
-        "LINE_CHANNEL_SECRET" to "mock_line_channel_secret",
-        "SPREADSHEET_ID" to "mock_spreadsheet_id",
-        "GOOGLE_CREDENTIALS_JSON" to "{}"
-    )
+internal class MockSecretProvider(
+    private val secrets: Map<String, String> = emptyMap()
+) : SecretProvider {
 
     override fun getSecret(key: String): String =
         secrets[key] ?: throw IllegalArgumentException("Secret key `$key` not found in mock.")
