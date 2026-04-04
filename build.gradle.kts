@@ -21,6 +21,6 @@ plugins {
 }
 
 allprojects {
-    group = "org.fog_rock"
+    group = "org.fog-rock"
     version = "1.0.0-alpha.1"
 }
