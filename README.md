@@ -50,7 +50,7 @@ Replace `LATEST_VERSION` with the latest version number you see in the [Packages
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("org.fog_rock:fr-line-agent-core:LATEST_VERSION")
+    implementation("org.fog-rock:fr-line-agent-core:LATEST_VERSION")
 }
 ```
 
