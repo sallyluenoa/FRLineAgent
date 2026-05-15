@@ -1,0 +1,1 @@
+# Google Cloud Platform 構築手順
