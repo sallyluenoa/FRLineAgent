@@ -50,3 +50,6 @@ This document defines the coding standards and project-specific constraints for 
 - **Design Diagrams:** The project's design specifications are located in `docs/designs/images` as PlantUML (`.puml`) files.
 - **Verification:** Before generating or modifying code, refer to the System Architecture, Class Diagrams, and Sequence Diagrams in that directory to ensure structural and behavioral consistency.
 - **Consistency:** All generated classes, methods, and interactions must align with the definitions provided in the UML diagrams.
+
+## 7. Tooling & String Literal Guidelines
+- **Backslash Escaping:** When generating string literals for tool inputs (e.g., `write_file`, `replace`, `run_shell_command`), pay special attention to backslashes. To ensure a literal backslash (`\`) is correctly represented in the final output (e.g., for shell command line continuations or Windows file paths), always use a double backslash (`\\`) in the string argument. This prevents the backslash from being misinterpreted as an escape sequence.
