@@ -2,6 +2,15 @@
 
 This document describes the procedure for setting up an application on the LINE Platform.
 
+## Table of Contents
+1.  [Prerequisites](#1-prerequisites)
+2.  [Create a Provider](#2-create-a-provider)
+3.  [Create a Channel](#3-create-a-channel)
+4.  [Account Settings](#4-account-settings)
+5.  [Enable and Configure Messaging API](#5-enable-and-configure-messaging-api)
+
+---
+
 ## 1. Prerequisites
 
 Before starting, please ensure the following preparations are complete:
