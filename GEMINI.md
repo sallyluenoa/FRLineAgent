@@ -41,6 +41,10 @@ This document defines the coding standards and project-specific constraints for 
 - **Test Code:** Do not provide KDoc for test classes or test methods.
 - **Test Method Naming:** Name test functions descriptively to convey their purpose. Follow the pattern `test<TargetMethod>_<Condition>`, where `<TargetMethod>` is the method under test and `<Condition>` describes the test case (e.g., `testHandleWebhook_success`, `testExecutePush_invalidData`).
 - **Tone:** Keep all technical communication professional and objective.
+- **Procedural Documents (Manuals):** When creating or modifying instructional documents (like setup guides):
+    - **Table of Contents:** Always include a table of contents (`目次`) at the beginning of the document for better navigation.
+    - **Bilingual Updates:** If the document exists in both Japanese and English (e.g., under `docs/infrastructure/`), ensure that both versions are updated simultaneously to maintain consistency.
+
 
 ## 5. Development Workflow
 - When generating new files, always ensure they are placed in the appropriate package structure.
