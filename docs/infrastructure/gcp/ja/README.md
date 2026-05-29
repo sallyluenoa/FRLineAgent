@@ -24,8 +24,12 @@
     -   [サービスアカウントへの追加権限付与](#サービスアカウントへの追加権限付与)
 6.  [設定の最終確認](#6-設定の最終確認)
     -   [Artifact Registryリポジトリの確認](#artifact-registryリポジトリの確認)
-    -   [サービスアカウントのロール確認](#サービスアカウントのロール確認)
+    -   [サービスアカウントのロール確認 (プロジェクトレベル)](#サービスアカウントのロール確認-プロジェクトレベル)
+    -   [サービスアカウントのロール確認 (サービスアカウント自身)](#サービスアカウントのロール確認-サービスアカウント自身)
     -   [Workload Identityプールの状態確認](#workload-identityプールの状態確認)
+7.  [デプロイ後の設定](#7-デプロイ後の設定)
+    -   [公開アクセスの許可](#71-公開アクセスの許可)
+    -   [サービスアカウントの変更](#72-サービスアカウントの変更)
 
 ---
 
@@ -271,18 +275,34 @@ gcloud artifacts repositories list \
 ```
 > **期待される結果:** 設定したリポジトリ名が表示され、`FORMAT`が`DOCKER`であることを確認します。
 
-### サービスアカウントのロール確認
+### サービスアカウントのロール確認 (プロジェクトレベル)
+プロジェクトに対してサービスアカウントに付与されているロールを確認します。
+
 ```shell
 gcloud projects get-iam-policy ${PROJECT_ID} \
     --flatten="bindings[].members" \
     --format="table(bindings.role)" \
     --filter="bindings.members:serviceAccount:${SERVICE_ACCOUNT}"
 ```
-> **期待される結果:** これまで付与した以下のロールが表示されることを確認します。
+> **期待される結果:** 以下のロールが表示されることを確認します。
 > - `roles/run.admin`
 > - `roles/artifactregistry.writer`
 > - `roles/secretmanager.secretAccessor`
 > - `roles/logging.logWriter`
+> - `roles/iam.serviceAccountUser`
+
+### サービスアカウントのロール確認 (サービスアカウント自身)
+サービスアカウント自身に対して付与されているロールを確認します。これは、サービスアカウントが自分自身の権限を借用したり、トークンを作成したりするために必要です。
+
+```shell
+gcloud iam service-accounts get-iam-policy ${SERVICE_ACCOUNT} \
+    --project=${PROJECT_ID} \
+    --flatten="bindings[].members" \
+    --format="table(bindings.role)" \
+    --filter="bindings.members:serviceAccount:${SERVICE_ACCOUNT}"
+```
+> **期待される結果:** 以下のロールが表示されることを確認します。
+> - `roles/iam.serviceAccountTokenCreator`
 > - `roles/iam.serviceAccountUser`
 
 ### Workload Identityプールの状態確認
@@ -293,3 +313,37 @@ gcloud iam workload-identity-pools providers list \
     --project=${PROJECT_ID}
 ```
 > **期待される結果:** `STATE`が`ACTIVE`であり、`attributeCondition`に設定したGitHubリポジトリが表示されていることを確認します。
+
+## 7. デプロイ後の設定
+
+GitHub Actionsによる初回デプロイが成功した後に、Cloud Runサービスに対して以下の設定を行います。
+
+### 7.1. 公開アクセスの許可
+LINE PlatformからのWebhookリクエストを受け付けるために、Cloud Runサービスへの認証されていないアクセスを許可する必要があります。
+
+-   **理由**: LINEのサーバーはGoogle Cloudの認証情報を持たないため、公開アクセスを許可しないとWebhookリクエストがブロックされ、LINE Botが機能しなくなります。
+
+#### 設定手順
+1.  GCPコンソールで**Cloud Run**を開き、デプロイされたサービスを選択します。
+2.  **「セキュリティ」**タブに移動します。
+3.  **「認証」**セクションで**「未認証の呼び出しを許可」**を選択します。
+4.  「保存」をクリックします。
+
+### 7.2. サービスアカウントの変更
+デプロイされたCloud Runサービスが、意図したサービスアカウントで実行されていることを確認し、必要に応じて変更します。
+
+-   **理由**: デフォルトでは意図しないサービスアカウント（Compute Engineデフォルトサービスアカウントなど）で実行されている可能性があり、最小権限の原則に反する場合があります。
+
+#### 設定手順
+1.  GCPコンソールで**Cloud Run**を開き、デプロイされたサービスを選択します。
+2.  **「リビジョン」**タブに移動し、最新リビジョンの**「セキュリティ」**詳細を確認します。
+3.  「サービスアカウント」が、この手順書で作成したサービスアカウントであるか確認します。
+4.  もし異なるサービスアカウントが設定されている場合は、Cloud Shellで以下のコマンドを実行して更新します。
+
+```shell
+gcloud run services update ${ARTIFACT_REGISTRY} \
+    --region=${LOCATION} \
+    --service-account="${SERVICE_ACCOUNT}" \
+    --project=${PROJECT_ID}
+```
+> **Note:** コマンド実行後、新しいリビジョンが作成されます。再度コンソールでサービスアカウントが正しく更新されていることを確認してください。

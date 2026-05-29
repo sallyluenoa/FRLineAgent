@@ -6,8 +6,8 @@ This document outlines the infrastructure setup procedures required to run this 
 1.  [Initial Setup](#1-initial-setup)
     -   [Registering a Billing Account](#registering-a-billing-account)
     -   [Creating a New Project](#creating-a-new-project)
-2.  [Secret Management (Secret Manager)](#2-secret-management-secret-manager)
-    -   [Enabling the Secret Manager API](#enabling-the-secret-manager-api)
+2.  [API Enablement and Secret Management](#2-api-enablement-and-secret-management)
+    -   [Enabling APIs](#enabling-apis)
     -   [Creating Secrets](#creating-secrets)
 3.  [Service Accounts and Authentication](#3-service-accounts-and-authentication)
     -   [Creating a Service Account](#creating-a-service-account)
@@ -24,8 +24,12 @@ This document outlines the infrastructure setup procedures required to run this 
     -   [Granting Additional Permissions to the Service Account](#granting-additional-permissions-to-the-service-account)
 6.  [Final Configuration Checks](#6-final-configuration-checks)
     -   [Verifying the Artifact Registry Repository](#verifying-the-artifact-registry-repository)
-    -   [Verifying Service Account Roles](#verifying-service-account-roles)
+    -   [Verifying Service Account Roles (Project-Level)](#verifying-service-account-roles-project-level)
+    -   [Verifying Service Account Roles (On the Service Account Itself)](#verifying-service-account-roles-on-the-service-account-itself)
     -   [Verifying Workload Identity Pool Status](#verifying-workload-identity-pool-status)
+7.  [Post-Deployment Configuration](#7-post-deployment-configuration)
+    -   [Allowing Public Access](#71-allowing-public-access)
+    -   [Updating the Service Account](#72-updating-the-service-account)
 
 ---
 
@@ -44,12 +48,15 @@ To use most Google Cloud APIs (including Secret Manager), you need to link an ac
 
 ---
 
-## 2. Secret Management (Secret Manager)
+## 2. API Enablement and Secret Management
 
-Use Secret Manager to securely store sensitive information like API keys and tokens.
+Enable the necessary APIs for the project and use Secret Manager to securely store sensitive information like API keys.
 
-### Enabling the Secret Manager API
-1.  In the Google Cloud Console search bar, type "**Secret Manager**" and enable the Secret Manager API.
+### Enabling APIs
+In the console's search bar, search for the following API names and click the "Enable" button for each.
+
+-   **Secret Manager API**: Required for managing sensitive information.
+-   **IAM Service Account Credentials API**: Required to impersonate service accounts.
 
 ### Creating Secrets
 Register the sensitive information required by the application.
@@ -58,7 +65,7 @@ Register the sensitive information required by the application.
 2.  **Name**: Enter a descriptive name, such as `LINE_CHANNEL_ACCESS_TOKEN`.
 3.  **Secret value**: Paste the actual token string issued from the LINE Developers Console or other services.
 4.  Click the "Create secret" button to save.
-5.  Repeat this process for all necessary secrets, such as `LINE_CHANNEL_SECRET` and Google Sheets API credentials.
+5.  Repeat this process for all necessary secrets, such as `LINE_CHANNEL_SECRET` and `GOOGLE_API_CREDENTIALS`.
 
 ---
 
@@ -151,19 +158,19 @@ Configure an endpoint to accept authentication requests from GitHub.
 
 ```shell
 # Create a Workload Identity Pool
-gcloud iam workload-identity-pools create "github-pool" \
-    --project="${PROJECT_ID}" \
-    --location="global" \
+gcloud iam workload-identity-pools create "github-pool" 
+    --project="${PROJECT_ID}" 
+    --location="global" 
     --display-name="GitHub Actions Pool"
 
 # Create a Workload Identity Provider (integrates with the GitHub repository)
-gcloud iam workload-identity-pools providers create-oidc "github-provider" \
-    --project="${PROJECT_ID}" \
-    --location="global" \
-    --workload-identity-pool="github-pool" \
-    --display-name="GitHub Actions Provider" \
-    --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository" \
-    --attribute-condition="attribute.repository == '${REPO}'" \
+gcloud iam workload-identity-pools providers create-oidc "github-provider" 
+    --project="${PROJECT_ID}" 
+    --location="global" 
+    --workload-identity-pool="github-pool" 
+    --display-name="GitHub Actions Provider" 
+    --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository" 
+    --attribute-condition="attribute.repository == '${REPO}'" 
     --issuer-uri="https://token.actions.githubusercontent.com"
 ```
 
@@ -172,25 +179,30 @@ Link access from GitHub to be accepted as the specified service account.
 
 ```shell
 # Bind access via Workload Identity to the service account
-gcloud iam service-accounts add-iam-policy-binding "${SERVICE_ACCOUNT}" \
-    --project="${PROJECT_ID}" \
-    --role="roles/iam.workloadIdentityUser" \
+gcloud iam service-accounts add-iam-policy-binding "${SERVICE_ACCOUNT}" 
+    --project="${PROJECT_ID}" 
+    --role="roles/iam.workloadIdentityUser" 
     --member="principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/github-pool/attribute.repository/${REPO}"
 
 # Grant permissions required for deploying to Cloud Run
-gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-    --member="serviceAccount:${SERVICE_ACCOUNT}" \
+gcloud projects add-iam-policy-binding ${PROJECT_ID} 
+    --member="serviceAccount:${SERVICE_ACCOUNT}" 
     --role="roles/run.admin"
 
 # Grant write permissions to Artifact Registry
-gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-    --member="serviceAccount:${SERVICE_ACCOUNT}" \
+gcloud projects add-iam-policy-binding ${PROJECT_ID} 
+    --member="serviceAccount:${SERVICE_ACCOUNT}" 
     --role="roles/artifactregistry.writer"
 
+# Grant permission to assign the service account to the Cloud Run service during deployment
+gcloud projects add-iam-policy-binding ${PROJECT_ID} 
+    --member="serviceAccount:${SERVICE_ACCOUNT}" 
+    --role="roles/iam.serviceAccountUser"
+
 # Grant permission for the deployed Cloud Run service to act as its own service account
-gcloud iam service-accounts add-iam-policy-binding "${SERVICE_ACCOUNT}" \
-    --project="${PROJECT_ID}" \
-    --member="serviceAccount:${SERVICE_ACCOUNT}" \
+gcloud iam service-accounts add-iam-policy-binding "${SERVICE_ACCOUNT}" 
+    --project="${PROJECT_ID}" 
+    --member="serviceAccount:${SERVICE_ACCOUNT}" 
     --role="roles/iam.serviceAccountUser"
 ```
 
@@ -198,10 +210,10 @@ gcloud iam service-accounts add-iam-policy-binding "${SERVICE_ACCOUNT}" \
 Run the following command and copy the output string. This value should be set as `GCP_WORKLOAD_IDENTITY_PROVIDER` in your GitHub repository's secrets.
 
 ```shell
-gcloud iam workload-identity-pools providers describe "github-provider" \
-    --project="${PROJECT_ID}" \
-    --location="global" \
-    --workload-identity-pool="github-pool" \
+gcloud iam workload-identity-pools providers describe "github-provider" 
+    --project="${PROJECT_ID}" 
+    --location="global" 
+    --workload-identity-pool="github-pool" 
     --format='value(name)'
 ```
 
@@ -220,10 +232,10 @@ export ARTIFACT_REGISTRY="fr-line-agent"
 export LOCATION="asia-northeast1"
 # --------------------------------------------------------
 
-gcloud artifacts repositories create ${ARTIFACT_REGISTRY} \
-    --project=${PROJECT_ID} \
-    --repository-format=docker \
-    --location=${LOCATION} \
+gcloud artifacts repositories create ${ARTIFACT_REGISTRY} 
+    --project=${PROJECT_ID} 
+    --repository-format=docker 
+    --location=${LOCATION} 
     --description="Docker repository for FRLineAgent"
 ```
 
@@ -232,14 +244,20 @@ Grant the permissions that the application needs at runtime to the service accou
 
 ```shell
 # Permission to access secrets in Secret Manager
-gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-    --member="serviceAccount:${SERVICE_ACCOUNT}" \
+gcloud projects add-iam-policy-binding ${PROJECT_ID} 
+    --member="serviceAccount:${SERVICE_ACCOUNT}" 
     --role="roles/secretmanager.secretAccessor"
 
 # Permission to write logs to Cloud Logging
-gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-    --member="serviceAccount:${SERVICE_ACCOUNT}" \
+gcloud projects add-iam-policy-binding ${PROJECT_ID} 
+    --member="serviceAccount:${SERVICE_ACCOUNT}" 
     --role="roles/logging.logWriter"
+
+# Permission required for the Google Auth Action to get an OIDC token
+gcloud iam service-accounts add-iam-policy-binding ${SERVICE_ACCOUNT} 
+    --project=${PROJECT_ID} 
+    --role="roles/iam.serviceAccountTokenCreator" 
+    --member="serviceAccount:${SERVICE_ACCOUNT}"
 ```
 
 ---
@@ -248,44 +266,84 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
 
 ### Verifying the Artifact Registry Repository
 ```shell
-gcloud artifacts repositories list \
-    --project=${PROJECT_ID} \
-    --location=${LOCATION} \
+gcloud artifacts repositories list 
+    --project=${PROJECT_ID} 
+    --location=${LOCATION} 
     --filter="name~${ARTIFACT_REGISTRY}"
 ```
 > **Expected Result:** The repository name you configured should be displayed, and its `FORMAT` should be `DOCKER`.
 
-### Verifying Service Account Roles
+### Verifying Service Account Roles (Project-Level)
+Verify the roles granted to the service account at the project level.
+
 ```shell
-gcloud projects get-iam-policy ${PROJECT_ID} \
-    --flatten="bindings[].members" \
-    --format="table(bindings.role)" \
-    --filter="bindings.members:${SERVICE_ACCOUNT}"
+gcloud projects get-iam-policy ${PROJECT_ID} 
+    --flatten="bindings[].members" 
+    --format="table(bindings.role)" 
+    --filter="bindings.members:serviceAccount:${SERVICE_ACCOUNT}"
 ```
-> **Expected Result:** Verify that the following roles, which you have granted, are displayed:
+> **Expected Result:** Verify that the following roles are displayed:
 > - `roles/run.admin`
 > - `roles/artifactregistry.writer`
 > - `roles/secretmanager.secretAccessor`
 > - `roles/logging.logWriter`
+> - `roles/iam.serviceAccountUser`
+
+### Verifying Service Account Roles (On the Service Account Itself)
+Verify the roles granted to the service account on itself. This is necessary for the service account to impersonate itself or create tokens.
+
+```shell
+gcloud iam service-accounts get-iam-policy ${SERVICE_ACCOUNT} 
+    --project=${PROJECT_ID} 
+    --flatten="bindings[].members" 
+    --format="table(bindings.role)" 
+    --filter="bindings.members:serviceAccount:${SERVICE_ACCOUNT}"
+```
+> **Expected Result:** Verify that the following roles are displayed:
+> - `roles/iam.serviceAccountTokenCreator`
+> - `roles/iam.serviceAccountUser`
 
 ### Verifying Workload Identity Pool Status
 ```shell
-gcloud iam workload-identity-pools providers list \
-    --workload-identity-pool="github-pool" \
-    --location="global" \
+gcloud iam workload-identity-pools providers list 
+    --workload-identity-pool="github-pool" 
+    --location="global" 
     --project=${PROJECT_ID}
 ```
 > **Expected Result:** Verify that the `STATE` is `ACTIVE` and that the GitHub repository specified in `attributeCondition` is displayed.
- - `roles/artifactregistry.writer`
-> - `roles/secretmanager.secretAccessor`
-> - `roles/logging.logWriter`
 
-### Verifying Workload Identity Pool Status
+---
+
+## 7. Post-Deployment Configuration
+
+These steps should be performed after the initial successful deployment via GitHub Actions.
+
+### 7.1. Allowing Public Access
+To accept webhook requests from the LINE Platform, you must allow unauthenticated access to your Cloud Run service.
+
+-   **Reason**: LINE's servers do not have Google Cloud credentials. If public access is not allowed, webhook requests will be blocked, and your LINE Bot will not function.
+
+#### Configuration Steps
+1.  In the GCP console, go to **Cloud Run** and select your deployed service.
+2.  Navigate to the **"Security"** tab.
+3.  In the **"Authentication"** section, select **"Allow unauthenticated invocations"**.
+4.  Click **"Save"**.
+
+### 7.2. Updating the Service Account
+Verify that the deployed Cloud Run service is running with the intended service account and update it if necessary.
+
+-   **Reason**: By default, the service may run with an unintended service account (like the Compute Engine default service account), which may violate the principle of least privilege.
+
+#### Configuration Steps
+1.  In the GCP console, go to **Cloud Run** and select your deployed service.
+2.  Navigate to the **"Revisions"** tab and check the **"Security"** details of the latest revision.
+3.  Verify that the **"Service account"** is the one created in this guide.
+4.  If a different service account is configured, run the following command in Cloud Shell to update it.
+
 ```shell
-gcloud iam workload-identity-pools providers list \
-    --workload-identity-pool="github-pool" \
-    --location="global" \
+gcloud run services update ${ARTIFACT_REGISTRY} 
+    --region=${LOCATION} 
+    --service-account="${SERVICE_ACCOUNT}" 
     --project=${PROJECT_ID}
 ```
-> **Expected Result:** Verify that the `STATE` is `ACTIVE` and that the GitHub repository specified in `attributeCondition` is displayed.
-ub repository specified in `attributeCondition` is displayed.
+> **Note:** After running the command, a new revision will be created. Verify in the console that the service account has been correctly updated.
