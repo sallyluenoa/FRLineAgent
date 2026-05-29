@@ -240,12 +240,6 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
 gcloud projects add-iam-policy-binding ${PROJECT_ID} \
     --member="serviceAccount:${SERVICE_ACCOUNT}" \
     --role="roles/logging.logWriter"
-
-# Permission required for the Google Auth Action to get an OIDC token
-gcloud iam service-accounts add-iam-policy-binding ${SERVICE_ACCOUNT} \
-    --project=${PROJECT_ID} \
-    --role="roles/iam.serviceAccountTokenCreator" \
-    --member="serviceAccount:${SERVICE_ACCOUNT}"
 ```
 
 ---
@@ -282,3 +276,16 @@ gcloud iam workload-identity-pools providers list \
     --project=${PROJECT_ID}
 ```
 > **Expected Result:** Verify that the `STATE` is `ACTIVE` and that the GitHub repository specified in `attributeCondition` is displayed.
+ - `roles/artifactregistry.writer`
+> - `roles/secretmanager.secretAccessor`
+> - `roles/logging.logWriter`
+
+### Verifying Workload Identity Pool Status
+```shell
+gcloud iam workload-identity-pools providers list \
+    --workload-identity-pool="github-pool" \
+    --location="global" \
+    --project=${PROJECT_ID}
+```
+> **Expected Result:** Verify that the `STATE` is `ACTIVE` and that the GitHub repository specified in `attributeCondition` is displayed.
+ub repository specified in `attributeCondition` is displayed.

@@ -6,8 +6,8 @@
 1.  [初期設定](#1-初期設定)
     -   [請求先アカウントの登録](#請求先アカウントの登録)
     -   [プロジェクトの新規作成](#プロジェクトの新規作成)
-2.  [シークレットの管理 (Secret Manager)](#2-シークレットの管理-secret-manager)
-    -   [Secret Manager APIの有効化](#secret-manager-apiの有効化)
+2.  [APIの有効化とシークレット管理](#2-apiの有効化とシークレット管理)
+    -   [各種APIの有効化](#各種apiの有効化)
     -   [シークレットの作成](#シークレットの作成)
 3.  [サービスアカウントと認証](#3-サービスアカウントと認証)
     -   [サービスアカウントの作成](#サービスアカウントの作成)
@@ -32,7 +32,7 @@
 ## 1. 初期設定
 
 ### 請求先アカウントの登録
-Google Cloudの多くのAPI（Secret Managerなど）を利用するには、プロジェクトに有効な請求先アカウントを紐付ける必要があります。
+Google Cloudの多くのAPIを利用するには、プロジェクトに有効な請求先アカウントを紐付ける必要があります。
 
 1.  **[Google Cloud Consoleのお支払いマネージャ](https://console.cloud.google.com/billing)** へアクセスします。
 2.  「請求先アカウントを作成」をクリックし、画面の指示に従ってクレジットカード情報などを登録します。
@@ -44,21 +44,24 @@ Google Cloudの多くのAPI（Secret Managerなど）を利用するには、プ
 
 ---
 
-## 2. シークレットの管理 (Secret Manager)
+## 2. APIの有効化とシークレット管理
 
-APIキーやトークンなどの機密情報は、Secret Managerを使用して安全に管理します。
+プロジェクトで利用する各種APIを有効化し、APIキーなどの機密情報をSecret Managerで安全に管理します。
 
-### Secret Manager APIの有効化
-1.  Google Cloudコンソールの検索窓で「**Secret Manager**」と入力し、Secret Manager APIを有効にします。
+### 各種APIの有効化
+コンソールの検索窓で以下のAPI名を検索し、それぞれ「有効にする」ボタンをクリックします。
+
+-   **Secret Manager API**: 機密情報を管理するために必要です。
+-   **IAM Service Account Credentials API**: サービスアカウントの権限を借用するために必要です。
 
 ### シークレットの作成
 アプリケーションで必要となる機密情報を登録します。
 
-1.  「シークレットを作成」をクリックします。
+1.  Secret Managerの画面を開き、「シークレットを作成」をクリックします。
 2.  **名前**: `LINE_CHANNEL_ACCESS_TOKEN` のように、一目で内容がわかる名前を入力します。
 3.  **シークレットの値**: LINE Developersコンソールなどで発行した実際のトークン文字列を貼り付けます。
 4.  「シークレットを作成」ボタンを押して保存します。
-5.  この手順を、`LINE_CHANNEL_SECRET` やGoogleスプレッドシートAPIの認証情報など、必要な情報の数だけ繰り返します。
+5.  この手順を、`LINE_CHANNEL_SECRET` や `GOOGLE_API_CREDENTIALS` など、必要な情報の数だけ繰り返します。
 
 ---
 
@@ -188,6 +191,11 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
     --member="serviceAccount:${SERVICE_ACCOUNT}" \
     --role="roles/artifactregistry.writer"
 
+# デプロイ時に、Cloud Runサービスにサービスアカウントを割り当てる権限
+gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+    --member="serviceAccount:${SERVICE_ACCOUNT}" \
+    --role="roles/iam.serviceAccountUser"
+
 # デプロイしたCloud Runが自分自身のサービスアカウントとして動作するための権限
 gcloud iam service-accounts add-iam-policy-binding "${SERVICE_ACCOUNT}" \
     --project="${PROJECT_ID}" \
@@ -268,13 +276,14 @@ gcloud artifacts repositories list \
 gcloud projects get-iam-policy ${PROJECT_ID} \
     --flatten="bindings[].members" \
     --format="table(bindings.role)" \
-    --filter="bindings.members:${SERVICE_ACCOUNT}"
+    --filter="bindings.members:serviceAccount:${SERVICE_ACCOUNT}"
 ```
 > **期待される結果:** これまで付与した以下のロールが表示されることを確認します。
 > - `roles/run.admin`
 > - `roles/artifactregistry.writer`
 > - `roles/secretmanager.secretAccessor`
 > - `roles/logging.logWriter`
+> - `roles/iam.serviceAccountUser`
 
 ### Workload Identityプールの状態確認
 ```shell
