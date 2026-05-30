@@ -13,7 +13,7 @@ This document outlines the infrastructure setup procedures required to run this 
     -   [Creating a Service Account](#creating-a-service-account)
     -   [Issuing a JSON Key (for Initial Setup)](#issuing-a-json-key-for-initial-setup)
     -   [Storing the Downloaded JSON Key in Secret Manager](#storing-the-downloaded-json-key-in-secret-manager)
-    -   [(Optional) Granting Access to Google Sheets](#optional-granting-access-to-google-sheets)
+    -   [(Optional) Granting Access to Google Workspace Resources](#optional-granting-access-to-google-workspace-resources)
 4.  [Integrating GitHub Actions and GCP (Workload Identity)](#4-integrating-github-actions-and-gcp-workload-identity)
     -   [Launching Cloud Shell and Setting Environment Variables](#launching-cloud-shell-and-setting-environment-variables)
     -   [Creating a Workload Identity Pool and Provider](#creating-a-workload-identity-pool-and-provider)
@@ -117,12 +117,17 @@ The downloaded key file is also sensitive information and should be stored in Se
 
 > **CRITICAL:** Once you have stored the secret in Secret Manager, **immediately delete the original JSON file** from your local machine. Never commit it to a Git repository or any other version control system.
 
-### (Optional) Granting Access to Google Sheets
-If you need the service account to interact with Google Sheets, follow these steps:
+### (Optional) Granting Access to Google Workspace Resources
+To allow a service account to interact with Google Workspace resources like Google Sheets, Google Docs, or Google Drive folders, you must enable the corresponding APIs in your GCP project in addition to sharing the resource.
+
+> **Note:** For example, to access files on Google Drive, enable the **Google Drive API**. To manipulate Google Sheets, enable the **Google Sheets API** in your GCP project.
+
+The procedure to grant access to a resource is as follows:
 
 1.  Open the issued JSON key file and copy the value of `client_email` (e.g., `your-service-account@your-project-id.iam.gserviceaccount.com`).
-2.  Open the Google Sheet you want to grant access to and click the "**Share**" button in the top right.
-3.  Paste the copied email address, grant it "**Editor**" permissions, and save.
+2.  Open the Google Workspace resource (e.g., a file or folder) to which you want to grant access.
+3.  Use the "**Share**" feature to add the copied service account email address.
+4.  Grant the necessary permissions (e.g., "Viewer", "Editor") for that resource and save.
 
 ---
 

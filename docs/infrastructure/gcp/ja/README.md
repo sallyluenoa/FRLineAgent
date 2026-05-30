@@ -13,7 +13,7 @@
     -   [サービスアカウントの作成](#サービスアカウントの作成)
     -   [JSONキーの発行（初回セットアップ用）](#jsonキーの発行初回セットアップ用)
     -   [ダウンロードしたJSONキーをSecret Managerへ保管](#ダウンロードしたjsonキーをsecret-managerへ保管)
-    -   [（オプション）Googleスプレッドシートへのアクセス許可](#オプションgoogleスプレッドシートへのアクセス許可)
+    -   [（オプション）Google Workspaceリソースへのアクセス許可](#オプションgoogle-workspaceリソースへのアクセス許可)
 4.  [GitHub ActionsとGCPの連携 (Workload Identity)](#4-github-actionsとgcpの連携-workload-identity)
     -   [Cloud Shellの起動と環境変数の設定](#cloud-shellの起動と環境変数の設定)
     -   [Workload Identityプールとプロバイダの作成](#workload-identityプールとプロバイダの作成)
@@ -117,12 +117,17 @@ CI/CD環境が整う前に、ローカル環境などからGCPへアクセスす
 
 > **CRITICAL:** Secret Managerへの保管が完了したら、ローカルPC上にある元のJSONファイルは**直ちに削除**してください。Gitリポジトリなどにコミットすることは絶対に避けてください。
 
-### （オプション）Googleスプレッドシートへのアクセス許可
-サービスアカウントを利用してGoogleスプレッドシートを操作する場合、以下の設定が必要です。
+### （オプション）Google Workspaceリソースへのアクセス許可
+サービスアカウントを利用してGoogleスプレッドシート、Googleドキュメント、Google DriveのフォルダといったGoogle Workspace上のリソースを操作する場合、リソース共有の設定に加えて、GCPプロジェクトで対応するAPIを有効化する必要があります。
+
+> **Note:** 例えば、Google Drive上のファイルにアクセスするには **Google Drive API** を、Googleスプレッドシートを操作するには **Google Sheets API** を、それぞれGCPプロジェクトで有効化してください。
+
+リソースへのアクセス許可は以下の手順で行います。
 
 1.  発行したJSONキーファイルを開き、`client_email` の値（例: `your-service-account@your-project-id.iam.gserviceaccount.com`）をコピーします。
-2.  アクセスしたいGoogleスプレッドシートを開き、右上の「**共有**」ボタンをクリックします。
-3.  コピーしたメールアドレスを共有先に追加し、「**編集者**」の権限を付与して保存します。
+2.  アクセスを許可したいGoogle Workspaceのリソース（ファイルやフォルダ）を開きます。
+3.  「**共有**」機能を使って、コピーしたサービスアカウントのメールアドレスを共有先に追加します。
+4.  そのリソースに対して必要な権限（例: 「閲覧者」、「編集者」）を付与して保存します。
 
 ---
 
