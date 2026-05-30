@@ -65,6 +65,7 @@ Register the sensitive information required by the application.
 2.  **Name**: Enter a descriptive name, such as `LINE_CHANNEL_ACCESS_TOKEN`.
 3.  **Secret value**: Paste the actual token string issued from the LINE Developers Console or other services.
 4.  Click the "Create secret" button to save.
+    *   *Note: Unless specified otherwise, you can leave other settings (like replication policy) at their default values.*
 5.  Repeat this process for all necessary secrets, such as `LINE_CHANNEL_SECRET` and `GOOGLE_API_CREDENTIALS`.
 
 ---
@@ -107,11 +108,11 @@ Immediately after issuing the key, revert the organization policy to its origina
 2.  Click "Manage policy" and set the rule back to "**On**" (i.e., disable key creation) and save the policy.
 
 ### Storing the Downloaded JSON Key in Secret Manager
-The content of the downloaded key file is also sensitive information and should be stored in Secret Manager.
+The downloaded key file is also sensitive information and should be stored in Secret Manager.
 
 1.  Go to the Secret Manager page and click "Create secret."
 2.  **Name**: Give it a descriptive name, such as `GOOGLE_API_CREDENTIALS`.
-3.  **Secret value**: **Copy and paste the entire content** of the downloaded JSON file.
+3.  **Secret value**: Instead of pasting text, select the option to **upload a file** and select the downloaded JSON file using the "Browse" button.
 4.  Save the secret.
 
 > **CRITICAL:** Once you have stored the secret in Secret Manager, **immediately delete the original JSON file** from your local machine. Never commit it to a Git repository or any other version control system.
