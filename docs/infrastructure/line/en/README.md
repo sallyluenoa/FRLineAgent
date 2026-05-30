@@ -58,12 +58,14 @@ Before starting, please ensure the following preparations are complete:
 ## 5. Enable and Configure Messaging API
 
 1. Access the **[Line Developer Console](https://developers.line.biz/console/)** and select the target provider.
-2. Confirm that the created channel is registered with the provider.
+2. Confirm that the created channel is registered with the provider. At this time, from the "Basic settings" tab, note down the **Channel secret**.
+    - > **Note:** This value must be registered in GCP's Secret Manager under the name `LINE_CHANNEL_SECRET`.
 3. **Webhook Settings:**
-    - Open the "Webhook settings" tab.
+    - Open the "Messaging API" tab.
     - **Webhook URL:** Enter your application's webhook endpoint URL.
     - Click the "Verify" button and confirm that a 200 status code is returned.
     - Enable "Use webhook".
 4. **Channel Access Token:**
-    - Go to the "Channel access token" section.
+    - In the same "Messaging API" tab, go to the "Channel access token" section.
     - Click the "Issue" button to issue a new access token.
+    - > **Note:** The issued token must be registered in GCP's Secret Manager under the name `LINE_CHANNEL_ACCESS_TOKEN`.
