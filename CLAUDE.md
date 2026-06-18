@@ -39,12 +39,19 @@ This document defines the coding standards and project-specific constraints for 
 - **KDoc:** Provide clear and concise KDoc for all public classes, interfaces, and functions.
 - **Override Methods:** Do not provide KDoc descriptions for overridden methods (methods with the `override` keyword), as they inherit documentation from their supertype.
 - **Test Code:** Do not provide KDoc for test classes or test methods.
-- **Test Method Naming:** Name test functions descriptively to convey their purpose. Follow the pattern `test<TargetMethod>_<Condition>`, where `<TargetMethod>` is the method under test and `<Condition>` describes the test case (e.g., `testHandleWebhook_success`, `testExecutePush_invalidData`).
+- **Test Method Naming:** Test function names must clearly describe their purpose using the CamelCase convention. Follow the pattern `test<TargetMethod>_<Condition>`.
+    - **`<TargetMethod>`:** The name of the method being tested.
+    - **`<Condition>`:** A concise description of the specific scenario or expected outcome being tested. Use CamelCase for multi-word descriptions.
+    - **Examples:**
+        - **Good:** `testHandleWebhook_success()` - Simple success case.
+        - **Good:** `testExecutePush_invalidData()` - Testing invalid data input.
+        - **Good:** `testProvideMessage_eventsAcrossMonths()` - Testing a specific logic path where events span multiple months.
+        - **Good:** `testHandleWebhook_noReplyOnGroupMessageWithoutMention()` - Testing a specific condition for not replying.
+    - **Avoid:** Do not use backticks (e.g., ``fun `test something`()``) for test names to ensure consistency across the project.
 - **Tone:** Keep all technical communication professional and objective.
 - **Procedural Documents (Manuals):** When creating or modifying instructional documents (like setup guides):
-    - **Table of Contents:** Always include a table of contents (`目次`) at the beginning of the document for better navigation.
+    - **Table of Contents:** Always include a table of contents at the beginning of the document for better navigation.
     - **Bilingual Updates:** If the document exists in both Japanese and English (e.g., under `docs/infrastructure/`), ensure that both versions are updated simultaneously to maintain consistency.
-
 
 ## 5. Development Workflow
 - When generating new files, always ensure they are placed in the appropriate package structure.
@@ -54,6 +61,3 @@ This document defines the coding standards and project-specific constraints for 
 - **Design Diagrams:** The project's design specifications are located in `docs/designs/images` as PlantUML (`.puml`) files.
 - **Verification:** Before generating or modifying code, refer to the System Architecture, Class Diagrams, and Sequence Diagrams in that directory to ensure structural and behavioral consistency.
 - **Consistency:** All generated classes, methods, and interactions must align with the definitions provided in the UML diagrams.
-
-## 7. Tooling & String Literal Guidelines
-- **Backslash Escaping:** When generating string literals for tool inputs (e.g., `write_file`, `replace`, `run_shell_command`), pay special attention to backslashes. To ensure a literal backslash (`\`) is correctly represented in the final output (e.g., for shell command line continuations or Windows file paths), always use a double backslash (`\\`) in the string argument. This prevents the backslash from being misinterpreted as an escape sequence.
